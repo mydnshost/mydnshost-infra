@@ -38,6 +38,9 @@ services:
       - mydnshost-internal
     depends_on:
       - database
+    volumes:
+      - bind-data:/bind
+      - api-config.local.php:/dnsapi/config.local.php
     labels:
       com.chameth.vhost: "devapi.mydnshost.co.uk"
       com.chameth.proxy: "80"
@@ -84,6 +87,8 @@ services:
 volumes:
 
   db-data:
+
+  bind-data:
 
 networks:
 
