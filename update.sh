@@ -40,10 +40,9 @@ docker-compose up -d
 
 # Extra files that we want.
 docker cp extra/hsts.conf autoproxy_nginx:/etc/nginx/conf.d/
-docker cp extra/redirect-http.conf autoproxy_nginx:/etc/nginx/conf.d/
 docker cp extra/security.conf autoproxy_nginx:/etc/nginx/conf.d/
 docker cp extra/ssl.conf autoproxy_nginx:/etc/nginx/conf.d/
-docker cp ../nginx-wellknown.conf autoproxy_nginx:/etc/nginx/conf.d/
+docker cp ../nginx-default.conf autoproxy_nginx:/etc/nginx/conf.d/
 
 cd "${DIR}"
 
