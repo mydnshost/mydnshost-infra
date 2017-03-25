@@ -37,7 +37,7 @@ services:
     networks:
       - mydnshost-internal
     depends_on:
-      - data1-db
+      - database
     labels:
       com.chameth.vhost: "devapi.mydnshost.co.uk"
       com.chameth.proxy: "80"

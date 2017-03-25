@@ -3,7 +3,7 @@ version: '2'
 
 services:
 
- letsencrypt-lexicon:
+  letsencrypt-lexicon:
     restart: never
     entrypoint: /bin/true
 
