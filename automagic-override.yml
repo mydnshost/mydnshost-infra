@@ -15,7 +15,7 @@ services:
       - letsencrypt-data:/letsencrypt
       - ../dns-hook-script:/run.sh
     environment:
-      - STAGING=yes
+      # - STAGING=yes
       - EMAIL=shane@mydnshost.co.uk
 
   nginx-config-hupper:
