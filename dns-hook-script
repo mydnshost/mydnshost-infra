@@ -8,7 +8,7 @@ interrupt() {
 
 trap interrupt SIGINT
 
-sed -i's#^WELLKNOWN=/letsencrypt$#WELLKNOWN=/letsencrypt/well-known#' /config
+sed -i 's#^WELLKNOWN=/letsencrypt$#WELLKNOWN=/letsencrypt/well-known#' /config
 mkdir -p '/letsencrypt/well-known'
 
 while true; do
