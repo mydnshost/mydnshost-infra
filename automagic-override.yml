@@ -25,6 +25,7 @@ services:
   nginx-updater:
     volumes:
       - ../docker-service-nginx_generate.py:/generate.py
+      - letsencrypt-data:/letsencrypt
 
   nginx:
     volumes:
