@@ -78,4 +78,4 @@ fi;
 echo "Waiting for start..."
 sleep 10;
 
-# docker exec -it mydnshost_api /var/www/html/admin/init.php
+docker exec -it mydnshost_api /dnsapi/admin/init.php
