@@ -40,7 +40,7 @@ services:
       - database
     volumes:
       - bind-data:/bind
-      - api-config.local.php:/dnsapi/config.local.php
+      - ./api-config.local.php:/dnsapi/config.local.php
     labels:
       com.chameth.vhost: "devapi.mydnshost.co.uk"
       com.chameth.proxy: "80"
