@@ -22,6 +22,10 @@ services:
     volumes:
       - ../nginx-hup-script:/script.sh
 
+  nginx-updater:
+    volumes:
+      - ../docker-service-nginx_generate.py:/generate.py
+
   nginx:
     volumes:
       - ../nginx-default/:/usr/share/nginx/html/
