@@ -1,0 +1,91 @@
+---
+
+version: '2'
+
+services:
+  web:
+    build: ./frontend
+    container_name: mydnshost_web
+    hostname: www
+    domainname: mydnshost.co.uk
+    environment:
+      - SITE_NAME=MyDNSHost_PROD
+      - API_URL=http://api/
+      - TEMPLATE_THEME=default
+    restart: always
+    networks:
+      - mydnshost-internal
+    depends_on:
+      - api
+    labels:
+      com.chameth.vhost: "dev.mydnshost.co.uk"
+      com.chameth.proxy: "80"
+
+  api:
+    build: ./api
+    container_name: mydnshost_api
+    hostname: api
+    domainname: mydnshost.co.uk
+    environment:
+      - HOOKKEY=413B5DC9-BF59-4533-AF60-834A5BB549EC
+      - DB_SERVER=database
+      - DB_SERVER_TYPE=mysql
+      - DB_SERVER_USERNAME=dnsapi
+      - DB_SERVER_PASSWORD=dnsapi
+      - DB_SERVER_DATABASE=dnsapi
+    restart: always
+    networks:
+      - mydnshost-internal
+    depends_on:
+      - data1-db
+    labels:
+      com.chameth.vhost: "devapi.mydnshost.co.uk"
+      com.chameth.proxy: "80"
+
+  database:
+    image: mysql:latest
+    container_name: mydnshost_database
+    hostname: metadb
+    domainname: mydnshost.co.uk
+    environment:
+      - MYSQL_USER=dnsapi
+      - MYSQL_PASSWORD=dnsapi
+      - MYSQL_DATABASE=dnsapi
+      - MYSQL_ROOT_PASSWORD=isukr7hgtistg
+    restart: always
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - mydnshost-internal
+    labels:
+      uk.co.mydnshost.maintenance.db.backup: "true"
+      uk.co.mydnshost.maintenance.db.user: "dnsapi"
+      uk.co.mydnshost.maintenance.db.pass: "dnsapi"
+      uk.co.mydnshost.maintenance.db.dbs: "dnsapi"
+
+  maintenance:
+    build: ./maintenance/container
+    container_name: mydnshost_maintenance
+    hostname: maintenance
+    domainname: mydnshost.co.uk
+    restart: always
+    environment:
+      - HOOKKEY=413B5DC9-BF59-4533-AF60-834A5BB549EC
+    volumes:
+      - ./maintenance/output:/output
+      - ./maintenance/scripts:/scripts
+      - ./maintenance/crontab:/etc/cron.d/maintenance
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - mydnshost-internal
+    depends_on:
+      - api
+
+volumes:
+
+  db-data:
+
+networks:
+
+  mydnshost-internal:
+

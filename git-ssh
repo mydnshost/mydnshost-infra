@@ -1,0 +1,6 @@
+#!/bin/sh
+if [ -z "$REPOKEY" ]; then
+    ssh "$@"
+else
+    ssh -i "$REPOKEY" "$@"
+fi

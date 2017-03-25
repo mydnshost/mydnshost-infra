@@ -1,0 +1,22 @@
+---
+
+version: '2'
+
+services:
+  web:
+    labels:
+      com.chameth.vhost: "<VHOST>"
+
+  api:
+    environment:
+      - HOOKKEY=
+    labels:
+      com.chameth.vhost: "api.somehost"
+
+  database:
+    environment:
+      - MYSQL_ROOT_PASSWORD=
+
+  maintenance:
+    environment:
+      - HOOKKEY=

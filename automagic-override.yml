@@ -1,0 +1,27 @@
+---
+version: '2'
+
+services:
+
+ letsencrypt-lexicon:
+    restart: never
+    entrypoint: /bin/true
+
+  letsencrypt-generic:
+    image: csmith/letsencrypt-generic:latest
+    container_name: autoproxy_letsencrypt-generic
+    restart: always
+    volumes:
+      - letsencrypt-data:/letsencrypt
+      - ../dns-hook-script:/run.sh
+    environment:
+      - STAGING=yes
+      - EMAIL=shane@mydnshost.co.uk
+
+  nginx-config-hupper:
+    volumes:
+      - ../nginx-hup-script:/script.sh
+
+  nginx:
+    volumes:
+      - ../nginx-default/:/usr/share/nginx/html/

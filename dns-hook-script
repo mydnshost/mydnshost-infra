@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+interrupt() {
+  echo
+  echo "Caught ^C, exiting."
+  exit 1
+}
+
+trap interrupt SIGINT
+
+sed -i's#^WELLKNOWN=/letsencrypt$#WELLKNOWN=/letsencrypt/well-known#' /config
+mkdir -p '/letsencrypt/well-known'
+
+while true; do
+  /letsencrypt.sh --cron --challenge http-01
+  /letsencrypt.sh --cleanup
+  inotifywait --timeout 86400 /letsencrypt/domains.txt
+  sleep 60
+done

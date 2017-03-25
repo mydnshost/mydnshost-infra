@@ -1,0 +1,4 @@
+0 */6 * * * root /scripts/backupDB.sh >/var/log/cron.log 2>&1
+0 0 * * * root /scripts/webhooks.sh "daily" >/var/log/cron.log 2>&1
+0 * * * * root /scripts/webhooks.sh "hourly" /var/log/cron.log 2>&1
+* * * * * root /scripts/webhooks.sh "minutely" /var/log/cron.log 2>&1
