@@ -9,7 +9,7 @@ services:
     hostname: www
     domainname: mydnshost.co.uk
     environment:
-      - SITE_NAME=MyDNSHost_PROD
+      - SITE_NAME=MyDNSHost
       - API_URL=http://api/
       - TEMPLATE_THEME=default
     restart: always
