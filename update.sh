@@ -77,4 +77,4 @@ fi;
 echo "Waiting for start..."
 sleep 10;
 
-docker exec -it mydnshost_api /dnsapi/admin/init.php
+docker exec -it mydnshost_api su www-data --shell=/bin/bash -c "/dnsapi/admin/init.php"
