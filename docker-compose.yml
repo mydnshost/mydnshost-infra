@@ -83,6 +83,19 @@ services:
       - mydnshost-internal
     depends_on:
       - api
+      
+  sessions1:
+    container_name: mydnshost_sessions1
+    image: memcached:alpine
+    hostname: sessions1
+    domainname: mydnshost.co.uk
+    restart: always
+    networks:
+      - mydnshost-internal
+    ports:
+      - "127.0.0.1:11211:11211"
+    mem_limit: 1g
+    command: memcached -m 1024m
 
 volumes:
 
