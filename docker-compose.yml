@@ -12,11 +12,13 @@ services:
       - SITE_NAME=MyDNSHost
       - API_URL=http://api/
       - TEMPLATE_THEME=default
+      - MEMCACHED=sessions1:11211
     restart: always
     networks:
       - mydnshost-internal
     depends_on:
       - api
+      - sessions1
     labels:
       com.chameth.vhost: "dev.mydnshost.co.uk"
       com.chameth.proxy: "80"
