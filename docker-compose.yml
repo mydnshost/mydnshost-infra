@@ -99,6 +99,26 @@ services:
     mem_limit: 1g
     command: memcached -m 1024m
 
+  bind:
+    build: ./bind
+    container_name: mydnshost_bind
+    hostname: bind
+    domainname: mydnshost.co.uk
+    environment:
+      - RUNMODE=MASTER
+    restart: always
+    networks:
+      - mydnshost-internal
+    depends_on:
+      - api
+    volumes:
+      - bind-data:/bind
+      - ./bind_rndc.conf:/etc/bind/rndc.key.conf
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
+
+
 volumes:
 
   db-data:

@@ -17,11 +17,16 @@ if [ ! -e "${DIR}/frontend/Dockerfile" ]; then
 	git clone git@github.com:ShaneMcC/mydnshost-frontend.git "${DIR}/frontend"
 fi;
 
+if [ ! -e "${DIR}/bind/Dockerfile" ]; then
+	export REPOKEY="${HOME}/.ssh/id_rsa_bind"
+	git clone git@github.com:ShaneMcC/mydnshost-bind.git "${DIR}/bind"
+fi
+
 if [ ! -e "${DIR}/nginx-proxy/docker-compose.yml" ]; then
         git clone https://github.com/csmith/docker-automatic-nginx-letsencrypt.git "${DIR}/nginx-proxy/"
 fi;
 
-if [ ! -e "${DIR}/api/Dockerfile" -o ! -e "${DIR}/frontend/Dockerfile" -o ! -e "${DIR}/nginx-proxy/docker-compose.yml" ]; then
+if [ ! -e "${DIR}/api/Dockerfile" -o ! -e "${DIR}/frontend/Dockerfile" -o ! -e "${DIR}/bind/Dockerfile" -o ! -e "${DIR}/nginx-proxy/docker-compose.yml" ]; then
 	echo 'Unable to obtain dependencies, aborting.';
 	exit 1;
 fi;
@@ -48,8 +53,9 @@ cd "${DIR}"
 
 APIVERSION=`git --git-dir="${DIR}/api/.git" describe --tags`
 FRONTENDVERSION=`git --git-dir="${DIR}/frontend/.git" describe --tags`
+BINDVERSION=`git --git-dir="${DIR}/bind/.git" describe --tags`
 
-for REPODIR in "${DIR}/api" "${DIR}/frontend"; do
+for REPODIR in "${DIR}/api" "${DIR}/frontend" "${DIR}/bind"; do
         echo "Updating '${REPODIR##*/}'.."
         cd "${REPODIR}"
         export REPOKEY="${HOME}/.ssh/id_rsa_${REPODIR##*/}"
@@ -63,6 +69,7 @@ done;
 
 NEW_APIVERSION=`git --git-dir="${DIR}/api/.git" describe --tags`
 NEW_FRONTENDVERSION=`git --git-dir="${DIR}/frontend/.git" describe --tags`
+NEW_BINDVERSION=`git --git-dir="${DIR}/bind/.git" describe --tags`
 
 docker-compose up -d
 
@@ -74,7 +81,13 @@ if [ "${NEW_FRONTENDVERSION}" != "${FRONTENDVERSION}" ]; then
 	docker-compose up -d --no-deps --build web
 fi;
 
+if [ "${NEW_BINDVERSION}" != "${BINDVERSION}" ]; then
+	docker-compose up -d --no-deps --build bind
+fi;
+
+
 echo "Waiting for start..."
 sleep 10;
 
+docker exec -it mydnshost_api ln -sf /dnsapi/examples/hooks/bind.php /dnsapi/hooks/bind.php
 docker exec -it mydnshost_api su www-data --shell=/bin/bash -c "/dnsapi/admin/init.php"

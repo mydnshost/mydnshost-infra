@@ -1,5 +1,6 @@
 api
 frontend
+bind
 nginx-proxy
 maintenance/output
 docker-compose.override.yml
