@@ -114,7 +114,7 @@ services:
       - api
     volumes:
       - bind-data:/bind
-      - ./bind_rndc.conf:/etc/bind/rndc.key.conf
+      - ./bind_rndc.conf:/etc/bind/rndc.controls.conf
     ports:
       - 53:53/tcp
       - 53:53/udp

@@ -74,20 +74,26 @@ NEW_BINDVERSION=`git --git-dir="${DIR}/bind/.git" describe --tags`
 docker-compose up -d
 
 if [ "${NEW_APIVERSION}" != "${APIVERSION}" ]; then
-	docker-compose up -d --no-deps --build api
+	docker-compose build --no-cache api
+	docker-compose up -d --no-deps api
 fi;
 
 if [ "${NEW_FRONTENDVERSION}" != "${FRONTENDVERSION}" ]; then
-	docker-compose up -d --no-deps --build web
+	docker-compose build --no-cache web
+	docker-compose up -d --no-deps web
 fi;
 
 if [ "${NEW_BINDVERSION}" != "${BINDVERSION}" ]; then
-	docker-compose up -d --no-deps --build bind
+	docker-compose build --no-cache bind
+	docker-compose up -d --no-deps bind
 fi;
 
+# The nginx-hupper sucks, so force-hup it.
+curl -X POST --silent --unix-socket /var/run/docker.sock "http:/containers/autoproxy_nginx/kill?signal=SIGHUP"
 
 echo "Waiting for start..."
 sleep 10;
 
 docker exec -it mydnshost_api ln -sf /dnsapi/examples/hooks/bind.php /dnsapi/hooks/bind.php
 docker exec -it mydnshost_api su www-data --shell=/bin/bash -c "/dnsapi/admin/init.php"
+
