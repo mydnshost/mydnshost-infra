@@ -95,5 +95,6 @@ echo "Waiting for start..."
 sleep 10;
 
 docker exec -it mydnshost_api ln -sf /dnsapi/examples/hooks/bind.php /dnsapi/hooks/bind.php
+docker exec -it mydnshost_api chown www-data: /bind
 docker exec -it mydnshost_api su www-data --shell=/bin/bash -c "/dnsapi/admin/init.php"
 
