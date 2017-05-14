@@ -43,6 +43,7 @@ services:
     volumes:
       - bind-data:/bind
       - ./api-config.local.php:/dnsapi/config.local.php
+      - ./rndc_rndc.conf:/etc/bind/rndc.conf
     labels:
       com.chameth.vhost: "devapi.mydnshost.co.uk"
       com.chameth.proxy: "80"
