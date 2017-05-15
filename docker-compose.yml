@@ -51,7 +51,7 @@ services:
   database:
     image: mysql:latest
     container_name: mydnshost_database
-    hostname: metadb
+    hostname: database
     domainname: mydnshost.co.uk
     environment:
       - MYSQL_USER=dnsapi
