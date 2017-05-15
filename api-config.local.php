@@ -9,3 +9,5 @@
 	$config['defaultRecords'][] = ['name' => '', 'type' => 'NS', 'content' => 'ns2.mydnshost.co.uk'];
 	$config['defaultRecords'][] = ['name' => '', 'type' => 'NS', 'content' => 'ns3.mydnshost.co.uk'];
 	$config['defaultRecords'][] = ['name' => '', 'type' => 'NS', 'content' => 'ns4.mydnshost.co.uk'];
+
+	$config['defaultSOA'] = ['primaryNS' => 'ns1.mydnshost.co.uk.'];
