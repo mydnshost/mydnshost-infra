@@ -82,6 +82,8 @@ services:
       - ./maintenance/scripts:/scripts
       - ./maintenance/crontab:/etc/cron.d/maintenance
       - /var/run/docker.sock:/var/run/docker.sock
+      - bind-data:/bind
+      - ./rndc_rndc.conf:/etc/bind/rndc.conf
     networks:
       - mydnshost-internal
     depends_on:
