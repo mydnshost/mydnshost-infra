@@ -77,6 +77,7 @@ if [ "${NEW_APIVERSION}" != "${APIVERSION}" ]; then
 	docker-compose build --no-cache api
 	docker-compose up -d --no-deps api
 	# The nginx-hupper sucks, so force-hup it.
+	sleep 2;
 	curl -X POST --silent --unix-socket /var/run/docker.sock "http:/containers/autoproxy_nginx/kill?signal=SIGHUP"
 fi;
 
@@ -84,6 +85,7 @@ if [ "${NEW_FRONTENDVERSION}" != "${FRONTENDVERSION}" ]; then
 	docker-compose build --no-cache web
 	docker-compose up -d --no-deps web
 	# The nginx-hupper sucks, so force-hup it.
+	sleep 2;
 	curl -X POST --silent --unix-socket /var/run/docker.sock "http:/containers/autoproxy_nginx/kill?signal=SIGHUP"
 fi;
 
@@ -91,9 +93,6 @@ if [ "${NEW_BINDVERSION}" != "${BINDVERSION}" ]; then
 	docker-compose build --no-cache bind
 	docker-compose up -d --no-deps bind
 fi;
-
-# The nginx-hupper sucks, so force-hup it.
-curl -X POST --silent --unix-socket /var/run/docker.sock "http:/containers/autoproxy_nginx/kill?signal=SIGHUP"
 
 echo "Waiting for start..."
 sleep 10;
