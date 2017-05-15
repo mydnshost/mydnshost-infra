@@ -102,3 +102,6 @@ docker exec -it mydnshost_api ln -sf /dnsapi/examples/hooks/bind.php /dnsapi/hoo
 docker exec -it mydnshost_api chown www-data: /bind
 docker exec -it mydnshost_api su www-data --shell=/bin/bash -c "/dnsapi/admin/init.php"
 
+# One last HUP for good measure!
+curl -X POST --silent --unix-socket /var/run/docker.sock "http:/containers/autoproxy_nginx/kill?signal=SIGHUP"
+
