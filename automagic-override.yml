@@ -18,10 +18,6 @@ services:
       # - STAGING=yes
       - EMAIL=shane@mydnshost.co.uk
 
-  nginx-config-hupper:
-    volumes:
-      - ../nginx-hup-script:/script.sh
-
   nginx-updater:
     volumes:
       - ../docker-service-nginx_generate.py:/generate.py
