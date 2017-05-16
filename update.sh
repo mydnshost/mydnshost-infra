@@ -79,17 +79,11 @@ docker-compose up -d
 if [ "${NEW_APIVERSION}" != "${APIVERSION}" ]; then
 	docker-compose build --no-cache api
 	docker-compose up -d --no-deps api
-	# The nginx-hupper sucks, so force-hup it.
-	sleep 2;
-	curl -X POST --silent --unix-socket /var/run/docker.sock "http:/containers/autoproxy_nginx/kill?signal=SIGHUP"
 fi;
 
 if [ "${NEW_FRONTENDVERSION}" != "${FRONTENDVERSION}" ]; then
 	docker-compose build --no-cache web
 	docker-compose up -d --no-deps web
-	# The nginx-hupper sucks, so force-hup it.
-	sleep 2;
-	curl -X POST --silent --unix-socket /var/run/docker.sock "http:/containers/autoproxy_nginx/kill?signal=SIGHUP"
 fi;
 
 if [ "${NEW_BINDVERSION}" != "${BINDVERSION}" ]; then
@@ -103,7 +97,3 @@ sleep 10;
 docker exec -it mydnshost_api ln -sf /dnsapi/examples/hooks/bind.php /dnsapi/hooks/bind.php
 docker exec -it mydnshost_api chown www-data: /bind
 docker exec -it mydnshost_api su www-data --shell=/bin/bash -c "/dnsapi/admin/init.php"
-
-# One last HUP for good measure!
-curl -X POST --silent --unix-socket /var/run/docker.sock "http:/containers/autoproxy_nginx/kill?signal=SIGHUP"
-
