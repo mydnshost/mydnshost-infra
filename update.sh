@@ -71,6 +71,9 @@ NEW_APIVERSION=`git --git-dir="${DIR}/api/.git" describe --tags`
 NEW_FRONTENDVERSION=`git --git-dir="${DIR}/frontend/.git" describe --tags`
 NEW_BINDVERSION=`git --git-dir="${DIR}/bind/.git" describe --tags`
 
+# Update base image just to be safe
+docker pull shanemcc/docker-apache-php-base
+
 docker-compose up -d
 
 if [ "${NEW_APIVERSION}" != "${APIVERSION}" ]; then
