@@ -35,6 +35,7 @@ services:
       - DB_SERVER_USERNAME=dnsapi
       - DB_SERVER_PASSWORD=dnsapi
       - DB_SERVER_DATABASE=dnsapi
+      - MEMCACHED=sessions1:11211
     restart: always
     networks:
       - mydnshost-internal
@@ -77,6 +78,7 @@ services:
     restart: always
     environment:
       - HOOKKEY=413B5DC9-BF59-4533-AF60-834A5BB549EC
+      - MEMCACHED=sessions1:11211
     volumes:
       - ./maintenance/output:/output
       - ./maintenance/scripts:/scripts
