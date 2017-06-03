@@ -35,6 +35,11 @@ services:
       - DB_SERVER_USERNAME=dnsapi
       - DB_SERVER_PASSWORD=dnsapi
       - DB_SERVER_DATABASE=dnsapi
+      - EMAIL_ENABLED=false
+      - EMAIL_SERVER=mysql
+      - EMAIL_USERNAME=
+      - EMAIL_PASSWORD=
+      - EMAIL_FROM=dns@example.org
       - MEMCACHED=sessions1:11211
     restart: always
     networks:
