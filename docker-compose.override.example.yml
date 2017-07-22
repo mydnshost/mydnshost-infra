@@ -4,12 +4,21 @@ version: '2'
 
 services:
   web:
+    environment:
+      - API_PUBLICURL=https://api.somehost/
+      - RECAPTCHA_SITE=
+      - RECAPTCHA_SECRET=
     labels:
       com.chameth.vhost: "<VHOST>"
 
   api:
     environment:
       - HOOKKEY=
+      - EMAIL_ENABLED=
+      - EMAIL_SERVER=
+      - EMAIL_USERNAME=
+      - EMAIL_PASSWORD=
+      - EMAIL_FROM=
     labels:
       com.chameth.vhost: "api.somehost"
 
