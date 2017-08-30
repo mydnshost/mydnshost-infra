@@ -16,7 +16,7 @@ if [ ! -e "${DIR}/nginx-proxy/docker-compose.yml" ]; then
         git clone https://github.com/csmith/docker-automatic-nginx-letsencrypt.git "${DIR}/nginx-proxy/"
 fi;
 
-if [ -e "${DIR}/bind/Dockerfile" -o ! -e "${DIR}/nginx-proxy/docker-compose.yml" ]; then
+if [ ! -e "${DIR}/bind/Dockerfile" -o ! -e "${DIR}/nginx-proxy/docker-compose.yml" ]; then
 	echo 'Unable to obtain dependencies, aborting.';
 	exit 1;
 fi;
