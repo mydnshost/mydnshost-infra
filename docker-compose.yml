@@ -4,7 +4,7 @@ version: '2'
 
 services:
   web:
-    build: ./frontend
+    image: mydnshost/mydnshost-frontend:latest
     container_name: mydnshost_web
     hostname: www
     domainname: mydnshost.co.uk
@@ -24,7 +24,7 @@ services:
       com.chameth.proxy: "80"
 
   api:
-    build: ./api
+    image: mydnshost/mydnshost-api:latest
     container_name: mydnshost_api
     hostname: api
     domainname: mydnshost.co.uk

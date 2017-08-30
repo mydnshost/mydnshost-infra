@@ -7,16 +7,6 @@ DIR="$(dirname "$(readlink -f "$0")")"
 
 export GIT_SSH="${DIR}/git-ssh"
 
-if [ ! -e "${DIR}/api/Dockerfile" ]; then
-	export REPOKEY="${HOME}/.ssh/id_rsa_api"
-	git clone git@github.com:ShaneMcC/mydnshost-api.git "${DIR}/api"
-fi;
-
-if [ ! -e "${DIR}/frontend/Dockerfile" ]; then
-	export REPOKEY="${HOME}/.ssh/id_rsa_frontend"
-	git clone git@github.com:ShaneMcC/mydnshost-frontend.git "${DIR}/frontend"
-fi;
-
 if [ ! -e "${DIR}/bind/Dockerfile" ]; then
 	export REPOKEY="${HOME}/.ssh/id_rsa_bind"
 	git clone git@github.com:ShaneMcC/mydnshost-bind.git "${DIR}/bind"
@@ -26,7 +16,7 @@ if [ ! -e "${DIR}/nginx-proxy/docker-compose.yml" ]; then
         git clone https://github.com/csmith/docker-automatic-nginx-letsencrypt.git "${DIR}/nginx-proxy/"
 fi;
 
-if [ ! -e "${DIR}/api/Dockerfile" -o ! -e "${DIR}/frontend/Dockerfile" -o ! -e "${DIR}/bind/Dockerfile" -o ! -e "${DIR}/nginx-proxy/docker-compose.yml" ]; then
+if [ -e "${DIR}/bind/Dockerfile" -o ! -e "${DIR}/nginx-proxy/docker-compose.yml" ]; then
 	echo 'Unable to obtain dependencies, aborting.';
 	exit 1;
 fi;
@@ -51,11 +41,9 @@ docker cp ../nginx-default.conf autoproxy_nginx:/etc/nginx/conf.d/
 
 cd "${DIR}"
 
-APIVERSION=`git --git-dir="${DIR}/api/.git" describe --tags`
-FRONTENDVERSION=`git --git-dir="${DIR}/frontend/.git" describe --tags`
 BINDVERSION=`git --git-dir="${DIR}/bind/.git" describe --tags`
 
-for REPODIR in "${DIR}/api" "${DIR}/frontend" "${DIR}/bind"; do
+for REPODIR in "${DIR}/bind"; do
         echo "Updating '${REPODIR##*/}'.."
         cd "${REPODIR}"
         export REPOKEY="${HOME}/.ssh/id_rsa_${REPODIR##*/}"
@@ -67,24 +55,14 @@ for REPODIR in "${DIR}/api" "${DIR}/frontend" "${DIR}/bind"; do
         echo ""
 done;
 
-NEW_APIVERSION=`git --git-dir="${DIR}/api/.git" describe --tags`
-NEW_FRONTENDVERSION=`git --git-dir="${DIR}/frontend/.git" describe --tags`
 NEW_BINDVERSION=`git --git-dir="${DIR}/bind/.git" describe --tags`
 
 # Update base image just to be safe
 docker pull shanemcc/docker-apache-php-base
+docker pull mydnshost/mydnshost-api
+docker pull mydnshost/mydnshost-frontend
 
 docker-compose up -d
-
-if [ "${NEW_APIVERSION}" != "${APIVERSION}" ]; then
-	docker-compose build --no-cache api
-	docker-compose up -d --no-deps api
-fi;
-
-if [ "${NEW_FRONTENDVERSION}" != "${FRONTENDVERSION}" ]; then
-	docker-compose build --no-cache web
-	docker-compose up -d --no-deps web
-fi;
 
 if [ "${NEW_BINDVERSION}" != "${BINDVERSION}" ]; then
 	docker-compose build --no-cache bind
