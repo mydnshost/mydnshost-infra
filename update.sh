@@ -57,8 +57,7 @@ done;
 
 NEW_BINDVERSION=`git --git-dir="${DIR}/bind/.git" describe --tags`
 
-# Update base image just to be safe
-docker pull shanemcc/docker-apache-php-base
+# Update images
 docker pull mydnshost/mydnshost-api
 docker pull mydnshost/mydnshost-frontend
 
