@@ -16,6 +16,9 @@ services:
     restart: always
     networks:
       - mydnshost-internal
+    depends_on:
+      - api
+      - sessions1
     labels:
       com.chameth.vhost: "dev.mydnshost.co.uk"
       com.chameth.proxy: "80"
@@ -41,6 +44,8 @@ services:
     restart: always
     networks:
       - mydnshost-internal
+    depends_on:
+      - database
     volumes:
       - bind-data:/bind
       - ./api-config.local.php:/dnsapi/config.local.php
@@ -88,6 +93,8 @@ services:
       - ./rndc_rndc.conf:/etc/bind/rndc.conf
     networks:
       - mydnshost-internal
+    depends_on:
+      - api
       
   sessions1:
     container_name: mydnshost_sessions1
@@ -112,6 +119,8 @@ services:
     restart: always
     networks:
       - mydnshost-internal
+    depends_on:
+      - api
     volumes:
       - bind-data:/bind
       - ./bind_rndc.conf:/etc/bind/rndc.controls.conf
