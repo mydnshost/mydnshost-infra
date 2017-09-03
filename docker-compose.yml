@@ -110,7 +110,7 @@ services:
     command: memcached -m 1024m
 
   bind:
-    build: ./bind
+    image: shanemcc/mydnshost-bind:latest
     container_name: mydnshost_bind
     hostname: bind
     domainname: mydnshost.co.uk
