@@ -39,7 +39,7 @@ cd "${DIR}"
 # Update images
 docker pull mydnshost/mydnshost-api
 docker pull mydnshost/mydnshost-frontend
-docker pull shanemcc/mydnshost-bind
+docker pull mydnshost/mydnshost-bind
 
 # Rebuild any running containers if needed.
 for IMAGE in api web bind; do
