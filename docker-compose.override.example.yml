@@ -34,3 +34,4 @@ services:
     environment:
       - MASTER=
       - SLAVES=
+      - RNDCKEY=
