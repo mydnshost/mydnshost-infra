@@ -118,6 +118,7 @@ services:
       - RUNMODE=MASTER
       - MASTER=1.1.1.1;
       - SLAVES=2.2.2.2; 3.3.3.3; 4.4.4.4;
+      - RNDCKEY=DTngw5O8I5Axx631GjQ9pA==
     restart: always
     networks:
       - mydnshost-internal
