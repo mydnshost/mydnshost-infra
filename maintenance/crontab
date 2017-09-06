@@ -5,8 +5,8 @@
 0 0 * * * root /scripts/webhooks.sh "daily" >/var/log/cron.log 2>&1
 
 # Hourly
-0 * * * * root /scripts/webhooks.sh "hourly" /var/log/cron.log 2>&1
-0 * * * * root /scripts/statuscake-updater/run.php "hourly" /var/log/cron.log 2>&1
+0 * * * * root /scripts/webhooks.sh "hourly" >/var/log/cron.log 2>&1
+0 * * * * root /scripts/statuscake-updater/run.php >/var/log/cron.log 2>&1
 
 # 5 Mins
 */5 * * * * root /scripts/webhooks.sh "5min" /var/log/cron.log 2>&1
