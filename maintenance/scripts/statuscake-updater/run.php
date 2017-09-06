@@ -42,7 +42,8 @@
 	}
 
 	// Create a new value
-	$newContent = sprintf('127.%d.%d.%d', random_int(0, 255), random_int(0, 255), random_int(0, 255));
+	// $newContent = sprintf('127.%d.%d.%d', random_int(0, 255), random_int(0, 255), random_int(0, 255));
+	$newContent = date('127.n.j.G'); // 127.month.day.hour
 
 	echo 'Setting activerr (', $rrs[$newActivePos], ') to ', $newContent, "\n";
 
