@@ -48,6 +48,9 @@ done
 # start cron
 service cron start
 
+# Init script.
+/scripts/init.sh
+
 # trap SIGINT and SIGTERM signals and gracefully exit
 trap "service cron stop; kill \$!; exit" SIGINT SIGTERM
 

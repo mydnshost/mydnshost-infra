@@ -84,6 +84,13 @@ services:
     environment:
       - HOOKKEY=413B5DC9-BF59-4533-AF60-834A5BB549EC
       - MEMCACHED=sessions1:11211
+      - API_URL=https://api.mydnshost.co.uk/
+      - API_DOMAIN=test.example.org
+      - API_RRNAMES=foobar,bazqux
+      - API_DOMAINKEY=SomeKey
+      - STATUSCAKE_USER=SomeUser
+      - STATUSCAKE_APIKEY=SomeKey
+      - STATUSCAKE_TESTIDS=12345,67890
     volumes:
       - ./maintenance/output:/output
       - ./maintenance/scripts:/scripts
@@ -95,7 +102,7 @@ services:
       - mydnshost-internal
     depends_on:
       - api
-      
+
   sessions1:
     container_name: mydnshost_sessions1
     image: memcached:alpine

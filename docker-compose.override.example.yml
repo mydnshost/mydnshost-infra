@@ -29,6 +29,13 @@ services:
   maintenance:
     environment:
       - HOOKKEY=
+      - API_URL=
+      - API_DOMAIN=
+      - API_RRNAMES=
+      - API_DOMAINKEY=
+      - STATUSCAKE_USER=
+      - STATUSCAKE_APIKEY=
+      - STATUSCAKE_TESTIDS=
 
   bind:
     environment:

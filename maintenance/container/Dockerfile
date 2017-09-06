@@ -1,7 +1,7 @@
 FROM ubuntu:xenial
 
 RUN apt-get clean && apt-get update \
-    && apt-get install -y cron php7.0-cli mysql-client netcat-openbsd wget curl bind9utils \
+    && apt-get install -y cron php7.0-cli mysql-client netcat-openbsd wget curl bind9utils composer \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkfifo --mode 0666 /var/log/cron.log
