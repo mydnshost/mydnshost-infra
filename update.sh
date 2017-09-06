@@ -40,9 +40,10 @@ cd "${DIR}"
 docker pull mydnshost/mydnshost-api
 docker pull mydnshost/mydnshost-frontend
 docker pull mydnshost/mydnshost-bind
+docker pull mydnshost/mydnshost-docker-cron
 
 # Rebuild any running containers if needed.
-for IMAGE in api web bind; do
+for IMAGE in api web bind maintenance; do
         RUNNING=`docker-compose ps "${IMAGE}" | grep " Up "`
         if [ "" != "${RUNNING}" ]; then
                 docker-compose up -d --no-deps "${IMAGE}"

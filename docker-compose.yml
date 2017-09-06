@@ -76,7 +76,7 @@ services:
       uk.co.mydnshost.maintenance.db.dbs: "dnsapi"
 
   maintenance:
-    build: ./maintenance/container
+    image: mydnshost/mydnshost-docker-cron:latest
     container_name: mydnshost_maintenance
     hostname: maintenance
     domainname: mydnshost.co.uk
