@@ -1,6 +1,9 @@
 #!/usr/bin/php
 <?php
 	require_once(__DIR__ . '/functions.php');
+
+	if (empty($config['mydnshost']['api']) || empty($config['statuscake']['username'])) { die(0); }
+
 	$api = new MyDNSHostAPI($config['mydnshost']['api']);
 	$api->setAuthDomainKey($config['mydnshost']['domain'], $config['mydnshost']['domain_key']);
 
