@@ -41,4 +41,5 @@ services:
     environment:
       - MASTER=
       - SLAVES=
+      - STATISTICS=
       - RNDCKEY=
