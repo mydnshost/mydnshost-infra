@@ -91,6 +91,8 @@ services:
       - STATUSCAKE_USER=SomeUser
       - STATUSCAKE_APIKEY=SomeKey
       - STATUSCAKE_TESTIDS=12345,67890
+      - INFLUX_HOST=influxdb
+      - INFLUX_BIND_SLAVES=ns1=1.1.1.1, ns2=2.2.2.2, ns3=3.3.3.3
     volumes:
       - ./maintenance/output:/output
       - ./maintenance/scripts:/scripts
@@ -139,12 +141,24 @@ services:
       - 53:53/tcp
       - 53:53/udp
 
+  influx:
+    image: mydnshost/influxdb:alpine
+    container_name: mydnshost_influxdb
+    hostname: influxdb
+    domainname: mydnshost.co.uk
+    restart: always
+    networks:
+      - mydnshost-internal
+    volumes:
+      - influxdb-data:/var/lib/influxdb
 
 volumes:
 
   db-data:
 
   bind-data:
+
+  influxdb-data:
 
 networks:
 
