@@ -44,3 +44,13 @@ services:
       - SLAVES=
       - STATISTICS=
       - RNDCKEY=
+
+  chronograf:
+    environment:
+      - TOKEN_SECRET=SomeKindOfSecret
+      - AUTH_DURATION=1h
+      - GH_CLIENT_ID=
+      - GH_CLIENT_SECRET=
+      - GH_ORGS=
+    labels:
+      com.chameth.vhost: "<VHOST>"

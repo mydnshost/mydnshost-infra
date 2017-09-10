@@ -153,6 +153,28 @@ services:
     volumes:
       - influxdb-data:/var/lib/influxdb
 
+  chronograf:
+    image: chronograf:alpine
+    container_name: mydnshost_chronograf
+    hostname: chronograf
+    domainname: mydnshost.co.uk
+    restart: always
+    networks:
+      - mydnshost-internal
+    volumes:
+      - chronograf-data:/var/lib/chronograf
+    environment:
+      - TOKEN_SECRET=SomeKindOfSecret
+      - AUTH_DURATION=1h
+      - GH_CLIENT_ID=
+      - GH_CLIENT_SECRET=
+      - GH_ORGS=
+      - INFLUXDB_URL=http://influxdb:8086/
+    labels:
+      com.chameth.vhost: "chronograf.dev.mydnshost.co.uk"
+      com.chameth.proxy: "8888"
+
+
 volumes:
 
   db-data:
@@ -160,6 +182,8 @@ volumes:
   bind-data:
 
   influxdb-data:
+
+  chronograf-data:
 
 networks:
 
