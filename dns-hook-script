@@ -11,9 +11,15 @@ trap interrupt SIGINT
 sed -i 's#^WELLKNOWN=/letsencrypt$#WELLKNOWN=/letsencrypt/well-known#' /config
 mkdir -p '/letsencrypt/well-known'
 
+BINNAME="/letsencrypt.sh"
+
+if [ -e "/dehydrated" ]; then
+	BINNAME="/dehydrated  --accept-terms"
+fi;
+
 while true; do
-  /letsencrypt.sh --cron --challenge http-01
-  /letsencrypt.sh --cleanup
+  ${BINNAME} --cron --challenge http-01
+  ${BINNAME} --cleanup
   inotifywait --timeout 86400 /letsencrypt/domains.txt
   sleep 60
 done
