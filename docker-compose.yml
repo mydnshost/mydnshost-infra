@@ -41,6 +41,7 @@ services:
       - EMAIL_PASSWORD=
       - EMAIL_FROM=dns@example.org
       - MEMCACHED=sessions1:11211
+      - INFLUX_HOST=influxdb
     restart: always
     networks:
       - mydnshost-internal
