@@ -36,6 +36,7 @@ services:
       - STATUSCAKE_USER=
       - STATUSCAKE_APIKEY=
       - STATUSCAKE_TESTIDS=
+      - INFLUX_BIND_SLAVES=
 
   bind:
     environment:

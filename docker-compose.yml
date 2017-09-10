@@ -142,7 +142,7 @@ services:
       - 53:53/udp
 
   influx:
-    image: mydnshost/influxdb:alpine
+    image: influxdb:alpine
     container_name: mydnshost_influxdb
     hostname: influxdb
     domainname: mydnshost.co.uk
