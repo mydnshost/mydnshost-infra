@@ -141,7 +141,7 @@ services:
       - 53:53/tcp
       - 53:53/udp
 
-  influx:
+  influxdb:
     image: influxdb:alpine
     container_name: mydnshost_influxdb
     hostname: influxdb
