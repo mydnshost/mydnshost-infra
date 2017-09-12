@@ -14,3 +14,4 @@
 # Every Minute
 * * * * * root /scripts/webhooks.sh "minutely" /var/log/cron.log 2>&1
 * * * * * root /scripts/gather-statistics/run.php >/var/log/cron.log 2>&1
+* * * * * root /scripts/dnssec.sh >/var/log/cron.log 2>&1
