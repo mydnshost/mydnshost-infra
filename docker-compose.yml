@@ -42,6 +42,7 @@ services:
       - EMAIL_FROM=dns@example.org
       - MEMCACHED=sessions1:11211
       - INFLUX_HOST=influxdb
+      - DNSSEC_DSKEY_FILES=/bind/keys
     restart: always
     networks:
       - mydnshost-internal
