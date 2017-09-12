@@ -17,6 +17,14 @@ ls -1 /bind/zones/ | while read ZONE; do
 			rndc loadkeys ${ZONE}
 			rndc sign ${ZONE}
 		fi;
+
+		if [ ! -e "/bind/keys/${ZONE}.dskey" ]; then
+			KSK=`grep -l key-signing '/bind/keys/K'"${ZONE}"*'.key'`
+
+			if [ "${KSK}" != "" ]; then
+				dnssec-dsfromkey "${KSK}" > "/bind/keys/${ZONE}.dskey"
+			fi;
+		fi;
 	fi;
 done;
 
