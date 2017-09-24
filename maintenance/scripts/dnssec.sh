@@ -26,7 +26,7 @@ ls -1 /bind/zones/ | while read ZONE; do
 
 			${RNDC} loadkeys ${ZONE}
 			${RNDC} sign ${ZONE}
-			${RNDC} signing -nsec3param 1 0 10 $(head -c 512 /dev/urandom | sha1sum | cut -b 1-16)
+			${RNDC} signing -nsec3param 1 0 10 $(head -c 512 /dev/urandom | sha1sum | cut -b 1-16) ${ZONE}
 		fi;
 
 		if [ ! -e "/bind/keys/${ZONE}.dskey" ]; then
