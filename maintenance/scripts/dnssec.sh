@@ -3,6 +3,8 @@
 mkdir -p /bind/keys
 chmod a+w /bind/
 
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 DNSSEC_KEYGEN=`which dnssec-keygen`
 RNDC=`which rndc`
 
