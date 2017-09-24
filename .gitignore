@@ -7,3 +7,4 @@ docker-compose.override.yml
 bind_rndc.conf
 rndc_rndc.conf
 api-config.local.php
+hooks.local.php
