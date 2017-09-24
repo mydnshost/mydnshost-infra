@@ -3,6 +3,14 @@
 mkdir -p /bind/keys
 chmod a+w /bind/
 
+DNSSEC_KEYGEN=`which dnssec-keygen`
+RNDC=`which rndc`
+
+if [ "${DNSSEC_KEYGEN}" = "" -o "${RNDC}" = "" ]; then
+	echo "Error: Unable to locate dnssec-keygen or rndc."
+	exit 1;
+fi;
+
 ls -1 /bind/zones/ | while read ZONE; do
 	EXT=${ZONE##*.}
 	ZONE=${ZONE%.*}
@@ -11,11 +19,11 @@ ls -1 /bind/zones/ | while read ZONE; do
 
 		if [ "${KEYS}" = "" ]; then
 			echo "Generating Keys for: ${ZONE}"
-			dnssec-keygen -r /dev/urandom -a RSASHA256 -b 2048 -K /bind/keys/ -f KSK ${ZONE}
-			dnssec-keygen -r /dev/urandom -a RSASHA256 -b 1024 -K /bind/keys/ ${ZONE}
+			${DNSSEC_KEYGEN} -r /dev/urandom -a RSASHA256 -b 2048 -K /bind/keys/ -f KSK ${ZONE}
+			${DNSSEC_KEYGEN} -r /dev/urandom -a RSASHA256 -b 1024 -K /bind/keys/ ${ZONE}
 
-			rndc loadkeys ${ZONE}
-			rndc sign ${ZONE}
+			${RNDC} loadkeys ${ZONE}
+			${RNDC} sign ${ZONE}
 		fi;
 
 		if [ ! -e "/bind/keys/${ZONE}.dskey" ]; then
