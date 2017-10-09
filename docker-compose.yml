@@ -175,6 +175,28 @@ services:
       com.chameth.vhost: "chronograf.dev.mydnshost.co.uk"
       com.chameth.proxy: "8888"
 
+  redis:
+    image: redis:latest
+    container_name: mydnshost_redis
+    hostname: redis
+    domainname: mydnshost.co.uk
+    restart: always
+    networks:
+      - mydnshost-internal
+    volumes:
+      - redis-data:/data
+
+  gearman:
+    image: artefactual/gearmand:latest
+    container_name: mydnshost_gearman
+    hostname: gearman
+    domainname: mydnshost.co.uk
+    command: --queue-type=redis --redis-server=redis
+    depends_on:
+      - redis
+    restart: always
+    networks:
+      - mydnshost-internal
 
 volumes:
 
@@ -185,6 +207,8 @@ volumes:
   influxdb-data:
 
   chronograf-data:
+
+  redis-data:
 
 networks:
 
