@@ -35,11 +35,8 @@ services:
       - DB_SERVER_USERNAME=dnsapi
       - DB_SERVER_PASSWORD=dnsapi
       - DB_SERVER_DATABASE=dnsapi
-      - EMAIL_ENABLED=false
-      - EMAIL_SERVER=mysql
-      - EMAIL_USERNAME=
-      - EMAIL_PASSWORD=
-      - EMAIL_FROM=dns@example.org
+      - JOBSERVER_HOST=gearman
+      - JOBSERVER_TYPE=gearman
       - MEMCACHED=sessions1:11211
       - INFLUX_HOST=influxdb
       - DNSSEC_DSKEY_FILES=/bind/keys
@@ -55,6 +52,39 @@ services:
     labels:
       com.chameth.vhost: "devapi.mydnshost.co.uk"
       com.chameth.proxy: "80"
+
+  gmworker1:
+    image: mydnshost/mydnshost-api:latest
+    container_name: mydnshost_gmworker1
+    hostname: gmworker1
+    domainname: mydnshost.co.uk
+    environment:
+      - DB_SERVER=database
+      - DB_SERVER_TYPE=mysql
+      - DB_SERVER_USERNAME=dnsapi
+      - DB_SERVER_PASSWORD=dnsapi
+      - DB_SERVER_DATABASE=dnsapi
+      - EMAIL_ENABLED=false
+      - EMAIL_SERVER=
+      - EMAIL_USERNAME=
+      - EMAIL_PASSWORD=
+      - EMAIL_FROM=dns@example.org
+      - MEMCACHED=sessions1:11211
+      - INFLUX_HOST=influxdb
+      - DNSSEC_DSKEY_FILES=/bind/keys
+      - JOBSERVER_HOST=gearman
+      - JOBSERVER_TYPE=gearman
+    restart: always
+    networks:
+      - mydnshost-internal
+    depends_on:
+      - api
+      - gearman
+    volumes:
+      - bind-data:/bind
+      - ./api-config.local.php:/dnsapi/config.local.php
+      - ./rndc_rndc.conf:/etc/bind/rndc.conf
+    command: /dnsapi/tasks/TaskRunner.php
 
   database:
     image: mysql:latest
