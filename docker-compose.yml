@@ -36,6 +36,7 @@ services:
       - DB_SERVER_PASSWORD=dnsapi
       - DB_SERVER_DATABASE=dnsapi
       - JOBSERVER_HOST=gearman
+      - JOBSERVER_TYPE=gearman
       - MEMCACHED=sessions1:11211
       - INFLUX_HOST=influxdb
       - DNSSEC_DSKEY_FILES=/bind/keys
@@ -72,6 +73,7 @@ services:
       - INFLUX_HOST=influxdb
       - DNSSEC_DSKEY_FILES=/bind/keys
       - JOBSERVER_HOST=gearman
+      - JOBSERVER_TYPE=gearman
     restart: always
     networks:
       - mydnshost-internal
@@ -219,7 +221,7 @@ services:
     container_name: mydnshost_gearman
     hostname: gearman
     domainname: mydnshost.co.uk
-    command: --queue-type=redis --redis-server=redis --verbose=DEBUG
+    command: --queue-type=redis --redis-server=redis
     depends_on:
       - redis
     restart: always
