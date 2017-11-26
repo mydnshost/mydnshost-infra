@@ -39,4 +39,11 @@ ls -1 /bind/zones/ | while read ZONE; do
 	fi;
 done;
 
-
+ls -1 /bind/keys/ | while read DSKEY; do
+	EXT=${DSKEY##*.}
+	ZONE=${DSKEY%.*}
+	if [ "${EXT}" = "dskey" -a ! -e "/bind/zones/${ZONE}.db" ]; then
+		echo "Cleaning up deleted zone: ${ZONE}"
+		rm -Rfv '/bind/keys/K'"${ZONE}"*'.key' '/bind/keys/'"${ZONE}"'.dskey' '/bind/zones/'"${ZONE}"'.db.jbk' '/bind/zones/'"${ZONE}"'.db.signed' '/bind/zones/'"${ZONE}"'.db.signed.jnl' 2>/dev/null
+	fi;
+done;
