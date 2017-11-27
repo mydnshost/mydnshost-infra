@@ -67,7 +67,7 @@ for IMAGE in api web; do
 		if [ "${NEED_UPGRADE}" = "1" ]; then
 			# Scale up to 2 to start new container.
 			echo 'Scaling up container: '"${NAME}";
-	                docker-compose up -d --no-deps --scale "${IMAGE}"=2 "${IMAGE}"
+	                docker-compose up -d --no-deps --no-recreate --scale "${IMAGE}"=2 "${IMAGE}"
 
 			# Kill off older containers.
 			docker-compose ps "${IMAGE}" | grep " Up " | head -n -1 | awk '{print $1}' | while read NAME; do
