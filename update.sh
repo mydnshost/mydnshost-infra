@@ -49,22 +49,24 @@ web_VERSION=`docker inspect $(docker images mydnshost/mydnshost-frontend --forma
 for IMAGE in api web; do
         RUNNING=`docker-compose ps "${IMAGE}" | grep " Up "`
         if [ "" != "${RUNNING}" ]; then
-		NEED_UPGRADE=0;
-		docker-compose ps "${IMAGE}" | grep " Up " | awk '{print $1}' | while read NAME; do
+		NEED_UPGRADE="0";
+
+		while read NAME; do
 			ID=`docker ps --filter name="${NAME}" --format {{.ID}}`
 			MY_VERSION=`docker inspect "${ID}" | "${DIR}/maintenance/scripts/jq" .[0].Image`
 			IMAGE_VERSION="${IMAGE}_VERSION"
 
 			if [ "${MY_VERSION}" != "${!IMAGE_VERSION}" ]; then
 				echo "${NAME} needs upgrading."
-				NEED_UPGRADE=1
+				NEED_UPGRADE="1"
 			else
 				echo "${NAME} is up to date."
 			fi;
-		done;
+		done <<< $(docker-compose ps "${IMAGE}" | grep " Up " | awk '{print $1}')
 
 		if [ "${NEED_UPGRADE}" = "1" ]; then
 			# Scale up to 2 to start new container.
+			echo 'Scaling up container: '"${NAME}";
 	                docker-compose up -d --no-deps --scale "${IMAGE}"=2 "${IMAGE}"
 
 			# Kill off older containers.
