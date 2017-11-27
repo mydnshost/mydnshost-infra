@@ -21,21 +21,30 @@ template = jinja_env.get_template('nginx.tpl')
 fetcher = etcdlib.Connection(args.etcd_host, args.etcd_port, args.etcd_prefix)
 
 while True:
-  services = []
+  services = {}
   domains = {k: v.split(',') for k, v in fetcher.get_label('com.chameth.vhost').items()}
   protocols = fetcher.get_label('com.chameth.proxy.protocol')
+  defaults = fetcher.get_label('com.chameth.proxy.default')
+  loadbalance = fetcher.get_label('com.chameth.proxy.loadbalance')
   for container, values in fetcher.get_label('com.chameth.proxy').items():
     networks = fetcher.get_networks(container)
     certfile = args.cert_path % domains[container][0];
+    up = 'lb_' + loadbalance[container] if container in loadbalance else 'ct_' + container
     if os.path.isfile(certfile):
-      services.append({
-        'protocol': protocols[container] if container in protocols else 'http',
-        'vhosts': domains[container],
+      if not up in services:
+        services[up] = {
+          'protocol': protocols[container] if container in protocols else 'http',
+          'vhosts': domains[container],
+          'hosts': [],
+          'certificate': args.cert_path % domains[container][0],
+          'trusted_certificate': args.trusted_cert_path % domains[container][0],
+          'certificate_key': args.cert_key_path % domains[container][0],
+          'default': container in defaults,
+        })
+
+      services[up]['hosts'].append({
         'host': next(iter(networks.values())), # TODO: Pick a bridge sensibly?
         'port': values,
-        'certificate': args.cert_path % domains[container][0],
-        'trusted_certificate': args.trusted_cert_path % domains[container][0],
-        'certificate_key': args.cert_key_path % domains[container][0]
       })
 
   with open('/nginx-config/vhosts.conf', 'w') as f:

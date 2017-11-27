@@ -21,6 +21,7 @@ services:
     labels:
       com.chameth.vhost: "dev.mydnshost.co.uk"
       com.chameth.proxy: "80"
+      com.chameth.proxy.loadbalance: "web"
 
   api:
     image: mydnshost/mydnshost-api:latest
@@ -50,6 +51,7 @@ services:
     labels:
       com.chameth.vhost: "devapi.mydnshost.co.uk"
       com.chameth.proxy: "80"
+      com.chameth.proxy.loadbalance: "api"
 
   gmworker1:
     image: mydnshost/mydnshost-api:latest

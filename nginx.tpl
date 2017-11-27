@@ -1,8 +1,14 @@
-{% for service in services %}
+{% for srvname, service in services.items() %}
+upstream {{ service.upstream }} {
+{% for upstream in service.hosts %}
+	server {{ upstream.host }}:{{ upstream.port }};
+{% endfor %}
+}
+
 server {
     server_name {{ ' '.join(service.vhosts) }};
-    listen [::]:443 ssl http2;
-    listen 443 ssl http2;
+    listen [::]:443{{ ' default_server' if service.default }} ssl http2;
+    listen 443{{ ' default_server' if service.default }} ssl http2;
 
     ssl_certificate {{ service.certificate }};
     ssl_trusted_certificate {{ service.trusted_certificate }};
@@ -24,7 +30,7 @@ server {
     }
 
     location / {
-        proxy_pass {{ service.protocol }}://{{ service.host }}:{{ service.port }};
+        proxy_pass {{ service.protocol }}://{{ service.upstream }};
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $remote_addr;
     }
