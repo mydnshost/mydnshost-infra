@@ -40,7 +40,7 @@ while True:
           'trusted_certificate': args.trusted_cert_path % domains[container][0],
           'certificate_key': args.cert_key_path % domains[container][0],
           'default': container in defaults,
-        })
+        }
 
       services[up]['hosts'].append({
         'host': next(iter(networks.values())), # TODO: Pick a bridge sensibly?
