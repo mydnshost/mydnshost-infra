@@ -18,6 +18,8 @@ fi;
 
 echo "DEPS OK";
 
+# Autoproxy uses a different project name.
+export COMPOSE_PROJECT_NAME=nginxproxy
 cd "${DIR}/nginx-proxy/"
 git reset --hard
 git checkout master
@@ -35,6 +37,9 @@ docker cp extra/ssl.conf autoproxy_nginx:/etc/nginx/conf.d/
 docker cp extra/default-server.conf autoproxy_nginx:/etc/nginx/conf.d/default.conf
 
 cd "${DIR}"
+
+# Our main project name
+export COMPOSE_PROJECT_NAME=mydnshost
 
 # Update images
 docker pull mydnshost/mydnshost-api
