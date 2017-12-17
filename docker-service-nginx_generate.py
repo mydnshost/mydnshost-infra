@@ -51,7 +51,7 @@ while True:
 
   with open('/nginx-config/vhosts.conf', 'w') as f:
     print('Writing vhosts.conf...', flush=True)
-    f.write(template.render(services=services, wellknown-path=args.wellknown-path))
+    f.write(template.render(services=services, wellknown_path=args.wellknown_path))
 
   print('Done writing config.', flush=True)
 
