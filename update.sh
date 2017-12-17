@@ -26,13 +26,13 @@ git reset --hard origin/master
 git submodule update --init --recursive
 rm -Rfv "${DIR}/nginx-proxy/docker-compose.override.yml";
 ln -s "${DIR}/automagic-override.yml" "${DIR}/nginx-proxy/docker-compose.override.yml"
-docker-compose up -d
+docker-compose up -d --remove-orphans
 
 # Extra files that we want.
 docker cp extra/hsts.conf autoproxy_nginx:/etc/nginx/conf.d/
 docker cp extra/security.conf autoproxy_nginx:/etc/nginx/conf.d/
 docker cp extra/ssl.conf autoproxy_nginx:/etc/nginx/conf.d/
-docker cp ../nginx-default.conf autoproxy_nginx:/etc/nginx/conf.d/
+docker cp extra/default-server.conf autoproxy_nginx:/etc/nginx/conf.d/default.conf
 
 cd "${DIR}"
 
@@ -104,7 +104,7 @@ done;
 
 DB_RUNNING=`docker-compose ps database | grep " Up "`
 
-docker-compose up -d
+docker-compose up -d --remove-orphans
 
 if [ "" = "${DB_RUNNING}" ]; then
 	echo "Waiting for database to start..."

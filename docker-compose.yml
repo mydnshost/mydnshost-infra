@@ -22,6 +22,7 @@ services:
       com.chameth.vhost: "dev.mydnshost.co.uk"
       com.chameth.proxy: "80"
       com.chameth.proxy.loadbalance: "web"
+      com.chameth.proxy.default: "true"
 
   api:
     image: mydnshost/mydnshost-api:latest

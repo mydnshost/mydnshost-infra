@@ -3,23 +3,16 @@ version: '2'
 
 services:
 
-  letsencrypt-generic:
-    image: csmith/letsencrypt-generic:latest
-    container_name: autoproxy_letsencrypt-generic
+  letsencrypt-http:
+    image: csmith/letsencrypt-http-01:latest
+    container_name: autoproxy_letsencrypt-http
     restart: always
     volumes:
       - letsencrypt-data:/letsencrypt
-      - ../dns-hook-script:/run.sh
     environment:
       # - STAGING=yes
       - ACCEPT_CA_TERMS=yes
       - EMAIL=shane@mydnshost.co.uk
-
-  nginx-updater:
-    volumes:
-      - ../docker-service-nginx_generate.py:/generate.py
-      - ../nginx.tpl:/nginx.tpl
-      - letsencrypt-data:/letsencrypt
 
   nginx:
     volumes:
