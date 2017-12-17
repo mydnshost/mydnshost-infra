@@ -42,6 +42,15 @@ docker pull mydnshost/mydnshost-frontend
 docker pull mydnshost/mydnshost-bind
 docker pull mydnshost/mydnshost-docker-cron
 
+function prepareAPIContainers() {
+	docker ps -a --format '{{.Names}}' | grep -i mydnshost_api_ | while read NAME; do
+	        docker exec -t "${NAME}" ln -sf /dnsapi/examples/hooks/bind_workers.php /dnsapi/hooks/bind.php
+	        docker exec -t "${NAME}" ln -sf /dnsapi/examples/hooks/webhook_workers.php /dnsapi/hooks/webhook.php
+	        docker exec -t "${NAME}" chown www-data: /bind
+		docker exec -t "${NAME}" su www-data --shell=/bin/bash -c "/dnsapi/admin/init.php"
+	done;
+}
+
 api_VERSION=`docker inspect $(docker images mydnshost/mydnshost-api --format "{{.ID}}") | "${DIR}/maintenance/scripts/jq" .[0].Id`
 web_VERSION=`docker inspect $(docker images mydnshost/mydnshost-frontend --format "{{.ID}}") | "${DIR}/maintenance/scripts/jq" .[0].Id`
 
@@ -69,6 +78,11 @@ for IMAGE in api web; do
 			echo 'Scaling up container: '"${NAME}";
 	                docker-compose up -d --no-deps --no-recreate --scale "${IMAGE}"=2 "${IMAGE}"
 
+			# Prepare all containers
+			if [ "${IMAGE}" = "api" ]; then
+				prepareAPIContainers;
+			fi;
+
 			# Kill off older containers.
 			docker-compose ps "${IMAGE}" | grep " Up " | head -n -1 | awk '{print $1}' | while read NAME; do
 				echo 'Stopping older container: '"${NAME}";
@@ -88,14 +102,13 @@ for IMAGE in bind maintenance; do
 	fi;
 done;
 
+DB_RUNNING=`docker-compose ps database | grep " Up "`
+
 docker-compose up -d
 
-echo "Waiting for start..."
-sleep 10;
+if [ "" = "${DB_RUNNING}" ]; then
+	echo "Waiting for database to start..."
+	sleep 10;
+fi;
 
-docker ps -a --format '{{.Names}}' | grep -i mydnshost_api_ | while read NAME; do
-	docker exec -t "${NAME}" ln -sf /dnsapi/examples/hooks/bind_workers.php /dnsapi/hooks/bind.php
-	docker exec -t "${NAME}" ln -sf /dnsapi/examples/hooks/webhook_workers.php /dnsapi/hooks/webhook.php
-	docker exec -t "${NAME}" chown www-data: /bind
-	docker exec -t "${NAME}" su www-data --shell=/bin/bash -c "/dnsapi/admin/init.php"
-done;
+prepareAPIContainers;
