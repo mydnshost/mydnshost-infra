@@ -10,9 +10,9 @@
 0 * * * * root /scripts/statuscake-updater/run.php >/var/log/cron.log 2>&1
 
 # 5 Mins
-*/5 * * * * root /scripts/webhooks.sh "5min" /var/log/cron.log 2>&1
+*/5 * * * * root /scripts/webhooks.sh "5min" >/var/log/cron.log 2>&1
 
 # Every Minute
-* * * * * root /scripts/webhooks.sh "minutely" /var/log/cron.log 2>&1
+* * * * * root /scripts/webhooks.sh "minutely" >/var/log/cron.log 2>&1
 * * * * * root /scripts/gather-statistics/run.php >/var/log/cron.log 2>&1
 * * * * * root /scripts/dnssec.sh >/var/log/cron.log 2>&1
