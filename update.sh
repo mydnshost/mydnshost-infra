@@ -89,7 +89,7 @@ for IMAGE in api web; do
 			fi;
 
 			# Kill off older containers.
-			docker-compose ps "${IMAGE}" | grep " Up " | head -n -1 | awk '{print $1}' | while read NAME; do
+			docker-compose ps "${IMAGE}" | grep " Up " | sort -V | head -n -1 | awk '{print $1}' | while read NAME; do
 				echo 'Stopping older container: '"${NAME}";
 				ID=`docker ps --filter name="${NAME}" --format {{.ID}}`
 				docker stop "${ID}"
