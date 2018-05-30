@@ -54,13 +54,14 @@ cp bind_rndc.example.conf bind_rndc.conf
 cp docker-compose.override.example.yml docker-compose.override.yml
 cp rndc_rndc.example.conf rndc_rndc.conf
 cp api-config.local.example.php api-config.local.php
+cp frontend-config.local.example.php frontend-config.local.php
 ```
 ### Edit non-example files as needed.
 
 You will need to edit all of the non-example files to suit your deployment.
 
 ```bash
-nano bind_rndc.conf docker-compose.override.yml rndc_rndc.conf api-config.local.php
+nano bind_rndc.conf docker-compose.override.yml rndc_rndc.conf api-config.local.php frontend-config.local.php
 ```
 
 ### Bring services up / Update running services.

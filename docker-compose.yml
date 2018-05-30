@@ -18,6 +18,8 @@ services:
     depends_on:
       - api
       - sessions1
+    volumes:
+      - ./frontend-config.local.php:/dnsfrontend/config.local.php
     labels:
       com.chameth.vhost: "dev.mydnshost.co.uk"
       com.chameth.proxy: "80"
