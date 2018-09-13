@@ -51,6 +51,7 @@ services:
       - bind-data:/bind
       - ./api-config.local.php:/dnsapi/config.local.php
       - ./rndc_rndc.conf:/etc/bind/rndc.conf
+      - /var/run/docker.sock:/var/run/docker.sock
     labels:
       com.chameth.vhost: "devapi.mydnshost.co.uk"
       com.chameth.proxy: "80"
