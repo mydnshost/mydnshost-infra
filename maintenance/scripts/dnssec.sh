@@ -33,7 +33,16 @@ ls -1 /bind/zones/ | while read ZONE; do
 			KSK=`grep -l key-signing '/bind/keys/K'"${ZONE}"*'.key'`
 
 			if [ "${KSK}" != "" ]; then
-				dnssec-dsfromkey "${KSK}" > "/bind/keys/${ZONE}.dskey"
+				# DNSKEY Records
+				cat "${KSK}" | grep -v '^;' > "/bind/keys/${ZONE}.dskey"
+
+				# DS Records
+				echo "" >> "/bind/keys/${ZONE}.dskey"
+				dnssec-dsfromkey "${KSK}" >> "/bind/keys/${ZONE}.dskey"
+
+				# CDS Records
+				echo "" >> "/bind/keys/${ZONE}.dskey"
+				dnssec-dsfromkey -C "${KSK}" >> "/bind/keys/${ZONE}.dskey"
 			fi;
 		fi;
 	fi;
