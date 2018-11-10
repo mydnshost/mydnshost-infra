@@ -3,6 +3,7 @@
 	$config['hooks']['bind']['catalogZoneFile'] = '/bind/catalog.db';
 	$config['hooks']['bind']['catalogZoneName'] = 'catalog.invalid';
 	$config['hooks']['bind']['zonedir'] = '/bind/zones';
+	$config['hooks']['bind']['keydir'] = '/bind/keys';
 
 	$config['defaultRecords'] = [];
 	$config['defaultRecords'][] = ['name' => '', 'type' => 'NS', 'content' => 'ns1.mydnshost.co.uk'];

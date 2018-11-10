@@ -1,5 +1,7 @@
 #!/bin/sh
 
+exit 0;
+
 mkdir -p /bind/keys
 chmod a+w /bind/
 
