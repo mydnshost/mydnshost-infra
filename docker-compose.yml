@@ -31,7 +31,6 @@ services:
     hostname: api
     domainname: mydnshost.co.uk
     environment:
-      - HOOKKEY=413B5DC9-BF59-4533-AF60-834A5BB549EC
       - DB_SERVER=database
       - DB_SERVER_TYPE=mysql
       - DB_SERVER_USERNAME=dnsapi
@@ -117,7 +116,6 @@ services:
     domainname: mydnshost.co.uk
     restart: always
     environment:
-      - HOOKKEY=413B5DC9-BF59-4533-AF60-834A5BB549EC
       - MEMCACHED=sessions1:11211
       - API_URL=https://api.mydnshost.co.uk/
       - API_DOMAIN=test.example.org
