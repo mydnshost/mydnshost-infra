@@ -3,17 +3,23 @@
 version: '2'
 
 services:
+  proxy:
+    command: --acme.email="<email>"
+    labels:
+      traefik.frontend.auth.basic.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
+      traefik.frontend.rule: "Host:<VHOST>"
+
   web:
     environment:
       - API_PUBLICURL=https://api.somehost/
       - RECAPTCHA_SITE=
       - RECAPTCHA_SECRET=
     labels:
-      com.chameth.vhost: "<VHOST>"
+      traefik.frontend.rule: "Host:<VHOST>"
 
   api:
     labels:
-      com.chameth.vhost: "api.somehost"
+      traefik.frontend.rule: "Host:api.somehost"
 
   gmworker1:
     environment:
@@ -52,4 +58,4 @@ services:
       - GH_CLIENT_SECRET=
       - GH_ORGS=
     labels:
-      com.chameth.vhost: "<VHOST>"
+      traefik.frontend.rule: "Host:<VHOST>"

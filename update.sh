@@ -7,39 +7,13 @@ DIR="$(dirname "$(readlink -f "$0")")"
 
 export GIT_SSH="${DIR}/git-ssh"
 
-if [ ! -e "${DIR}/nginx-proxy/docker-compose.yml" ]; then
-        git clone https://github.com/csmith/docker-automatic-nginx-letsencrypt.git "${DIR}/nginx-proxy/"
-fi;
-
-if [ ! -e "${DIR}/nginx-proxy/docker-compose.yml" ]; then
-	echo 'Unable to obtain dependencies, aborting.';
-	exit 1;
-fi;
-
-echo "DEPS OK";
-
-# Autoproxy uses a different project name.
-export COMPOSE_PROJECT_NAME=nginxproxy
-cd "${DIR}/nginx-proxy/"
-git reset --hard
-git checkout master
-git fetch origin
-git reset --hard origin/master
-git submodule update --init --recursive
-rm -Rfv "${DIR}/nginx-proxy/docker-compose.override.yml";
-ln -s "${DIR}/automagic-override.yml" "${DIR}/nginx-proxy/docker-compose.override.yml"
-docker-compose up -d --remove-orphans
-
-# Extra files that we want.
-docker cp extra/hsts.conf autoproxy_nginx:/etc/nginx/conf.d/
-docker cp extra/security.conf autoproxy_nginx:/etc/nginx/conf.d/
-docker cp extra/ssl.conf autoproxy_nginx:/etc/nginx/conf.d/
-docker cp extra/default-server.conf autoproxy_nginx:/etc/nginx/conf.d/default.conf
-
 cd "${DIR}"
 
 # Our main project name
 export COMPOSE_PROJECT_NAME=mydnshost
+
+touch traefik/acme.json
+chmod 600 traefik/acme.json
 
 # Update images
 docker pull mydnshost/mydnshost-api
@@ -49,8 +23,6 @@ docker pull mydnshost/mydnshost-docker-cron
 
 function prepareAPIContainers() {
 	docker ps -a --format '{{.Names}}' | grep -i mydnshost_api_ | while read NAME; do
-	        docker exec -t "${NAME}" ln -sf /dnsapi/examples/hooks/bind_workers.php /dnsapi/hooks/bind.php
-	        docker exec -t "${NAME}" ln -sf /dnsapi/examples/hooks/webhook_workers.php /dnsapi/hooks/webhook.php
 	        docker exec -t "${NAME}" chown www-data: /bind
 		docker exec -t "${NAME}" su www-data --shell=/bin/bash -c "/dnsapi/admin/init.php"
 	done;
@@ -87,6 +59,9 @@ for IMAGE in api web; do
 			if [ "${IMAGE}" = "api" ]; then
 				prepareAPIContainers;
 			fi;
+
+			# Wait for traefik
+			sleep 2;
 
 			# Kill off older containers.
 			docker-compose ps "${IMAGE}" | grep " Up " | sort -V | head -n -1 | awk '{print $1}' | while read NAME; do
