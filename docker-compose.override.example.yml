@@ -9,6 +9,10 @@ services:
       traefik.frontend.auth.basic.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
       traefik.frontend.rule: "Host:<VHOST>"
 
+  static:
+    labels:
+      traefik.frontend.rule: "Host:static.somehost"
+
   web:
     environment:
       - API_PUBLICURL=https://api.somehost/

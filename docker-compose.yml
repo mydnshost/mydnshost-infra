@@ -26,6 +26,28 @@ services:
       traefik.port: "8090"  
       traefik.enable: "true"
 
+  static:
+    image: pierrezemb/gostatic
+    hostname: static
+    command: -fallback web-error.html
+    container_name: mydnshost_static
+    restart: always
+    networks:
+      - mydnshost-internal
+    volumes:
+      - ./static-pages:/srv/http
+    labels:
+      # I'd really like to not have this, but traefik won't let me
+      # have a backend-only container it insists on having a matching frontend.
+      # So here we are...
+      traefik.frontend.rule: "Host:static.dev.mydnshost.co.uk"
+      traefik.frontend.redirect.permanent: "true"
+      traefik.frontend.redirect.entryPoint: "https"
+      traefik.frontend.headers.STSSeconds: "31536000"
+      traefik.backend: "static"
+      traefik.port: "8043"
+      traefik.enable: "true"
+
   web:
     image: mydnshost/mydnshost-frontend:latest
     hostname: www
@@ -53,6 +75,9 @@ services:
       traefik.frontend.headers.STSSeconds: "31536000"
       traefik.backend: "web"
       traefik.port: "80"
+      traefik.frontend.errors.network.backend: "static"
+      traefik.frontend.errors.network.query: "/web-error.html"
+      traefik.frontend.errors.network.status: "500-599"
 
   api:
     image: mydnshost/mydnshost-api:latest
@@ -86,6 +111,9 @@ services:
       traefik.frontend.headers.STSSeconds: "31536000"
       traefik.backend: "api"
       traefik.port: "80"
+      traefik.frontend.errors.network.backend: "static"
+      traefik.frontend.errors.network.query: "/api-error.json"
+      traefik.frontend.errors.network.status: "500-599"
 
   gmworker1:
     image: mydnshost/mydnshost-api:latest
