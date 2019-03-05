@@ -17,7 +17,8 @@ chmod 600 traefik/acme.json
 
 # Update images
 echo 'Updating images...';
-cat docker-compose.yml docker-compose.override.yml | grep -i "image:" | sort -u | awk '{print $2}' | while read IMAGE; do docker pull ${IMAGE}; done
+docker-compose pull
+# cat docker-compose.yml docker-compose.override.yml | grep -i "image:" | sort -u | awk '{print $2}' | while read IMAGE; do docker pull ${IMAGE}; done
 # docker pull mydnshost/mydnshost-api
 # docker pull mydnshost/mydnshost-frontend
 # docker pull mydnshost/mydnshost-bind
