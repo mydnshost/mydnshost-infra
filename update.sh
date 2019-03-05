@@ -16,10 +16,12 @@ touch traefik/acme.json
 chmod 600 traefik/acme.json
 
 # Update images
-docker pull mydnshost/mydnshost-api
-docker pull mydnshost/mydnshost-frontend
-docker pull mydnshost/mydnshost-bind
-docker pull mydnshost/mydnshost-docker-cron
+echo 'Updating images...';
+cat docker-compose.yml docker-compose.override.yml | grep -i "image:" | sort -u | awk '{print $2}' | while read IMAGE; do docker pull ${IMAGE}; done
+# docker pull mydnshost/mydnshost-api
+# docker pull mydnshost/mydnshost-frontend
+# docker pull mydnshost/mydnshost-bind
+# docker pull mydnshost/mydnshost-docker-cron
 
 function prepareAPIContainers() {
 	docker ps -a --format '{{.Names}}' | grep -i mydnshost_api_ | while read NAME; do
@@ -31,10 +33,15 @@ function prepareAPIContainers() {
 api_VERSION=`docker inspect $(docker images mydnshost/mydnshost-api --format "{{.ID}}") | "${DIR}/maintenance/scripts/jq" .[0].Id`
 web_VERSION=`docker inspect $(docker images mydnshost/mydnshost-frontend --format "{{.ID}}") | "${DIR}/maintenance/scripts/jq" .[0].Id`
 
+# Create any needed containers.
+echo 'Creating...';
+docker-compose up --no-start
+
 # Rebuild running stateless containers if needed by scaling up then killing off the older containers.
 for IMAGE in api web; do
         RUNNING=`docker-compose ps "${IMAGE}" | grep " Up "`
         if [ "" != "${RUNNING}" ]; then
+		echo 'Checking '${IMAGE}'...';
 		NEED_UPGRADE="0";
 
 		while read NAME; do
@@ -51,6 +58,8 @@ for IMAGE in api web; do
 		done <<< $(docker-compose ps "${IMAGE}" | grep " Up " | awk '{print $1}')
 
 		if [ "${NEED_UPGRADE}" = "1" ]; then
+			echo 'Updating with scale...';
+
 			# Scale up to 2 to start new container.
 			echo 'Scaling up container: '"${NAME}";
 	                docker-compose up -d --no-deps --no-recreate --scale "${IMAGE}"=2 "${IMAGE}"
@@ -63,6 +72,7 @@ for IMAGE in api web; do
 			# Wait for traefik
 			sleep 2;
 
+			echo 'Scaling back down...';
 			# Kill off older containers.
 			docker-compose ps "${IMAGE}" | grep " Up " | sort -V | head -n -1 | awk '{print $1}' | while read NAME; do
 				echo 'Stopping older container: '"${NAME}";
@@ -78,13 +88,16 @@ done;
 for IMAGE in bind maintenance; do
 	RUNNING=`docker-compose ps "${IMAGE}" | grep " Up "`
 	if [ "" != "${RUNNING}" ]; then
+		echo 'Checking '${IMAGE}'...';
 		docker-compose up -d --no-deps "${IMAGE}"
 	fi;
 done;
 
 DB_RUNNING=`docker-compose ps database | grep " Up "`
 
+echo "Starting all..."
 docker-compose up -d --remove-orphans
+
 
 if [ "" = "${DB_RUNNING}" ]; then
 	echo "Waiting for database to start..."
