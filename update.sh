@@ -35,8 +35,8 @@ api_VERSION=`docker inspect $(docker images mydnshost/mydnshost-api --format "{{
 web_VERSION=`docker inspect $(docker images mydnshost/mydnshost-frontend --format "{{.ID}}") | "${DIR}/maintenance/scripts/jq" .[0].Id`
 
 # Create any needed containers.
-echo 'Creating...';
-docker-compose up --no-start
+# echo 'Creating...';
+# docker-compose up --no-start
 
 # Rebuild running stateless containers if needed by scaling up then killing off the older containers.
 for IMAGE in api web; do
