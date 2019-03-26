@@ -4,7 +4,7 @@ version: '2'
 
 services:
   proxy:
-    image: traefik:latest
+    image: traefik:1.7
     container_name: mydnshost_proxy
     restart: always
     network_mode: host
