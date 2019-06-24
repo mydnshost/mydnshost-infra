@@ -1,6 +1,6 @@
 ---
 
-version: '2'
+version: '2.3'
 
 services:
   proxy:
@@ -53,6 +53,7 @@ services:
 
   web:
     image: mydnshost/mydnshost-frontend:latest
+    scale: 1
     hostname: www
     domainname: mydnshost.co.uk
     environment:
@@ -86,6 +87,7 @@ services:
 
   api:
     image: mydnshost/mydnshost-api:latest
+    scale: 1
     hostname: api
     domainname: mydnshost.co.uk
     environment:
