@@ -24,7 +24,7 @@ services:
       traefik.frontend.headers.STSIncludeSubdomains: "true"
       traefik.frontend.headers.STSPreload: "true"
       traefik.backend: "traefik"
-      traefik.port: "8090"  
+      traefik.port: "8090"
       traefik.enable: "true"
 
   static:
@@ -179,7 +179,7 @@ services:
       uk.co.mydnshost.maintenance.db.dbs: "dnsapi"
 
   maintenance:
-    image: mydnshost/mydnshost-docker-cron:latest
+    image: mydnshost/mydnshost-maintenance:latest
     container_name: mydnshost_maintenance
     hostname: maintenance
     domainname: mydnshost.co.uk

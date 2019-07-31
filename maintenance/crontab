@@ -1,9 +1,0 @@
-# 6 Hourly
-0 */6 * * * root /scripts/backupDB.sh >/var/log/cron.log 2>&1
-0 */6 * * * root /scripts/backupBindData.sh >/var/log/cron.log 2>&1
-
-# Hourly
-0 * * * * root /scripts/statuscake-updater/run.php >/var/log/cron.log 2>&1
-
-# Every Minute
-* * * * * root /scripts/gather-statistics/run.php >/var/log/cron.log 2>&1
