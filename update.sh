@@ -31,8 +31,8 @@ function prepareAPIContainers() {
 	done;
 }
 
-api_VERSION=`docker inspect $(docker images mydnshost/mydnshost-api --format "{{.ID}}") | "${DIR}/maintenance/scripts/jq" .[0].Id`
-web_VERSION=`docker inspect $(docker images mydnshost/mydnshost-frontend --format "{{.ID}}") | "${DIR}/maintenance/scripts/jq" .[0].Id`
+api_VERSION=`docker inspect $(docker images mydnshost/mydnshost-api --format "{{.ID}}") | "${DIR}/jq" .[0].Id`
+web_VERSION=`docker inspect $(docker images mydnshost/mydnshost-frontend --format "{{.ID}}") | "${DIR}/jq" .[0].Id`
 
 # Create any needed containers.
 # echo 'Creating...';
@@ -47,7 +47,7 @@ for IMAGE in api web; do
 
 		while read NAME; do
 			ID=`docker ps --filter name="${NAME}" --format {{.ID}}`
-			MY_VERSION=`docker inspect "${ID}" | "${DIR}/maintenance/scripts/jq" .[0].Image`
+			MY_VERSION=`docker inspect "${ID}" | "${DIR}/jq" .[0].Image`
 			IMAGE_VERSION="${IMAGE}_VERSION"
 
 			if [ "${MY_VERSION}" != "${!IMAGE_VERSION}" ]; then
