@@ -26,7 +26,7 @@ docker-compose pull
 
 function prepareAPIContainers() {
 	docker ps -a --format '{{.Names}}' | grep -i mydnshost_api_ | while read NAME; do
-	        docker exec -t "${NAME}" chown www-data: /bind
+		docker exec -t "${NAME}" chown www-data: /bind
 		docker exec -t "${NAME}" su www-data --shell=/bin/bash -c "/dnsapi/admin/init.php"
 	done;
 }

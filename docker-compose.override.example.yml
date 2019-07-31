@@ -33,6 +33,10 @@ services:
       - EMAIL_PASSWORD=
       - EMAIL_FROM=
 
+  gmworker2:
+    environment:
+      - DUMMY_ENV=
+
   database:
     environment:
       - MYSQL_ROOT_PASSWORD=

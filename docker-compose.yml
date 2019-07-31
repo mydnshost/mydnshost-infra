@@ -145,6 +145,33 @@ services:
       - DNSSEC_DSKEY_FILES=/bind/keys
       - JOBSERVER_HOST=gearman
       - JOBSERVER_TYPE=gearman
+      - WORKER_WORKERS=*,-verify_2fa_push,-call_domain_hooks
+    restart: always
+    networks:
+      - mydnshost-internal
+    depends_on:
+      - api
+      - gearman
+    volumes:
+      - bind-data:/bind
+      - ./api-config.local.php:/dnsapi/config.local.php
+      - ./rndc_rndc.conf:/etc/bind/rndc.conf
+    command: /dnsapi/tasks/TaskRunner.php
+
+  gmworker2:
+    image: mydnshost/mydnshost-api:latest
+    container_name: mydnshost_gmworker2
+    hostname: gmworker2
+    domainname: mydnshost.co.uk
+    environment:
+      - DB_SERVER=database
+      - DB_SERVER_TYPE=mysql
+      - DB_SERVER_USERNAME=dnsapi
+      - DB_SERVER_PASSWORD=dnsapi
+      - DB_SERVER_DATABASE=dnsapi
+      - JOBSERVER_HOST=gearman
+      - JOBSERVER_TYPE=gearman
+      - WORKER_WORKERS=verify_2fa_push,call_domain_hooks
     restart: always
     networks:
       - mydnshost-internal
