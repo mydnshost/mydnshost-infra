@@ -185,7 +185,6 @@ services:
     domainname: mydnshost.co.uk
     restart: always
     environment:
-      - MEMCACHED=sessions1:11211
       - API_URL=https://api.mydnshost.co.uk/
       - API_DOMAIN=test.example.org
       - API_RRNAMES=foobar,bazqux
@@ -197,11 +196,8 @@ services:
       - INFLUX_BIND_SLAVES=ns1=1.1.1.1, ns2=2.2.2.2, ns3=3.3.3.3
     volumes:
       - ./maintenance/output:/output
-      - ./maintenance/scripts:/scripts
-      - ./maintenance/crontab:/etc/cron.d/maintenance
       - /var/run/docker.sock:/var/run/docker.sock
       - bind-data:/bind
-      - ./rndc_rndc.conf:/etc/bind/rndc.conf
     networks:
       - mydnshost-internal
     depends_on:
