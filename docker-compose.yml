@@ -200,6 +200,7 @@ services:
       - JOBSERVER_TYPE=gearman
       - WORKER_WORKERS=verify_2fa_push,call_domain_hooks
       - RABBITMQ_HOST=rabbitmq
+      - REDIS_HOST=redis
     restart: always
     networks:
       - mydnshost-internal
