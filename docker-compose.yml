@@ -123,6 +123,30 @@ services:
       traefik.frontend.errors.network.query: "/api-error.json"
       traefik.frontend.errors.network.status: "500-599"
 
+  dispatcher:
+    image: mydnshost/mydnshost-api:latest
+    container_name: mydnshost_dispatcher
+    hostname: dispatcher
+    domainname: mydnshost.co.uk
+    environment:
+      - DB_SERVER=database
+      - DB_SERVER_TYPE=mysql
+      - DB_SERVER_USERNAME=dnsapi
+      - DB_SERVER_PASSWORD=dnsapi
+      - DB_SERVER_DATABASE=dnsapi
+      - REDIS_HOST=redis
+      - JOBSERVER_HOST=gearman
+      - JOBSERVER_TYPE=gearman
+    restart: always
+    networks:
+      - mydnshost-internal
+    depends_on:
+      - api
+      - rabbitmq
+    volumes:
+      - ./api-config.local.php:/dnsapi/config.local.php
+    command: /dnsapi/dispatcher/JobDispatcher.php
+
   gmworker1:
     image: mydnshost/mydnshost-api:latest
     container_name: mydnshost_gmworker1
