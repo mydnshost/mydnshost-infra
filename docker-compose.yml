@@ -346,13 +346,24 @@ services:
       - mydnshost-internal
 
   rabbitmq:
-    image: rabbitmq:latest
+    image: rabbitmq:management
     container_name: mydnshost_rabbitmq
     hostname: rabbitmq
     domainname: mydnshost.co.uk
     restart: always
     networks:
       - mydnshost-internal
+    labels:
+      traefik.frontend.auth.basic.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
+      traefik.frontend.rule: "Host:rabbitmq.dev.mydnshost.co.uk"
+      traefik.frontend.redirect.permanent: "true"
+      traefik.frontend.redirect.entryPoint: "https"
+      traefik.frontend.headers.STSSeconds: "31536000"
+      traefik.frontend.headers.STSIncludeSubdomains: "true"
+      traefik.frontend.headers.STSPreload: "true"
+      traefik.backend: "rabbitmq"
+      traefik.port: "15672"
+      traefik.enable: "true"
 
 volumes:
 
