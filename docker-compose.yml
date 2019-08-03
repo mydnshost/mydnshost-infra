@@ -60,7 +60,7 @@ services:
       - SITE_NAME=MyDNSHost
       - API_URL=http://api/
       - TEMPLATE_THEME=default
-      - MEMCACHED=sessions1:11211
+      - REDIS_HOST=redis
     restart: always
     networks:
       - mydnshost-internal
@@ -98,7 +98,7 @@ services:
       - DB_SERVER_DATABASE=dnsapi
       - JOBSERVER_HOST=gearman
       - JOBSERVER_TYPE=gearman
-      - MEMCACHED=sessions1:11211
+      - REDIS_HOST=redis
       - INFLUX_HOST=influxdb
     restart: always
     networks:
@@ -140,7 +140,7 @@ services:
       - EMAIL_USERNAME=
       - EMAIL_PASSWORD=
       - EMAIL_FROM=dns@example.org
-      - MEMCACHED=sessions1:11211
+      - REDIS_HOST=redis
       - INFLUX_HOST=influxdb
       - DNSSEC_DSKEY_FILES=/bind/keys
       - JOBSERVER_HOST=gearman
@@ -229,19 +229,6 @@ services:
       - mydnshost-internal
     depends_on:
       - api
-
-  sessions1:
-    container_name: mydnshost_sessions1
-    image: memcached:alpine
-    hostname: sessions1
-    domainname: mydnshost.co.uk
-    restart: always
-    networks:
-      - mydnshost-internal
-    ports:
-      - "127.0.0.1:11211:11211"
-    mem_limit: 1g
-    command: memcached -m 1024m
 
   bind:
     image: mydnshost/mydnshost-bind:latest
