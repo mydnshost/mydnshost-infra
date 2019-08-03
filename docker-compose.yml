@@ -105,6 +105,7 @@ services:
       - mydnshost-internal
     depends_on:
       - database
+      - rabbitmq
     volumes:
       - bind-data:/bind
       - ./api-config.local.php:/dnsapi/config.local.php
