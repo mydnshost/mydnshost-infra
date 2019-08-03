@@ -314,6 +314,15 @@ services:
     networks:
       - mydnshost-internal
 
+  rabbitmq:
+    image: rabbitmq:latest
+    container_name: mydnshost_rabbitmq
+    hostname: rabbitmq
+    domainname: mydnshost.co.uk
+    restart: always
+    networks:
+      - mydnshost-internal
+
 volumes:
 
   db-data:
