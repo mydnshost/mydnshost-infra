@@ -99,6 +99,7 @@ services:
       - JOBSERVER_TYPE=gearman
       - REDIS_HOST=redis
       - INFLUX_HOST=influxdb
+      - RABBITMQ_HOST=rabbitmq
     restart: always
     networks:
       - mydnshost-internal
@@ -137,6 +138,7 @@ services:
       - REDIS_HOST=redis
       - JOBSERVER_HOST=gearman
       - JOBSERVER_TYPE=gearman
+      - RABBITMQ_HOST=rabbitmq
     restart: always
     networks:
       - mydnshost-internal
@@ -169,6 +171,7 @@ services:
       - JOBSERVER_HOST=gearman
       - JOBSERVER_TYPE=gearman
       - WORKER_WORKERS=*,-verify_2fa_push,-call_domain_hooks
+      - RABBITMQ_HOST=rabbitmq
     restart: always
     networks:
       - mydnshost-internal
@@ -195,6 +198,7 @@ services:
       - JOBSERVER_HOST=gearman
       - JOBSERVER_TYPE=gearman
       - WORKER_WORKERS=verify_2fa_push,call_domain_hooks
+      - RABBITMQ_HOST=rabbitmq
     restart: always
     networks:
       - mydnshost-internal
@@ -244,6 +248,7 @@ services:
       - STATUSCAKE_TESTIDS=12345,67890
       - INFLUX_HOST=influxdb
       - INFLUX_BIND_SLAVES=ns1=1.1.1.1, ns2=2.2.2.2, ns3=3.3.3.3
+      - RABBITMQ_HOST=rabbitmq
     volumes:
       - ./maintenance/output:/output
       - /var/run/docker.sock:/var/run/docker.sock
