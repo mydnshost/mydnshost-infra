@@ -123,6 +123,29 @@ services:
       traefik.frontend.errors.network.query: "/api-error.json"
       traefik.frontend.errors.network.status: "500-599"
 
+  joblogger:
+    image: mydnshost/mydnshost-api:latest
+    container_name: mydnshost_joblogger
+    hostname: joblogger
+    domainname: mydnshost.co.uk
+    environment:
+      - DB_SERVER=database
+      - DB_SERVER_TYPE=mysql
+      - DB_SERVER_USERNAME=dnsapi
+      - DB_SERVER_PASSWORD=dnsapi
+      - DB_SERVER_DATABASE=dnsapi
+      - REDIS_HOST=redis
+      - RABBITMQ_HOST=rabbitmq
+    restart: always
+    networks:
+      - mydnshost-internal
+    depends_on:
+      - api
+      - rabbitmq
+    volumes:
+      - ./api-config.local.php:/dnsapi/config.local.php
+    command: /dnsapi/joblogger/JobLogger.php
+
   dispatcher:
     image: mydnshost/mydnshost-api:latest
     container_name: mydnshost_dispatcher
