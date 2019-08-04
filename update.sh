@@ -66,9 +66,9 @@ for IMAGE in api web; do
 	                docker-compose up -d --no-deps --no-recreate --scale "${IMAGE}"=2 "${IMAGE}"
 
 			# Prepare all containers
-			if [ "${IMAGE}" = "api" ]; then
-				prepareAPIContainers;
-			fi;
+			# if [ "${IMAGE}" = "api" ]; then
+			# 	prepareAPIContainers;
+			# fi;
 
 			# Wait for traefik
 			sleep 2;
@@ -100,9 +100,9 @@ echo "Starting all..."
 docker-compose up -d --remove-orphans
 
 
-if [ "" = "${DB_RUNNING}" ]; then
-	echo "Waiting for database to start..."
-	sleep 10;
-fi;
+# if [ "" = "${DB_RUNNING}" ]; then
+# 	echo "Waiting for database to start..."
+# 	sleep 10;
+# fi;
 
-prepareAPIContainers;
+# prepareAPIContainers;
