@@ -95,8 +95,6 @@ services:
       - DB_SERVER_USERNAME=dnsapi
       - DB_SERVER_PASSWORD=dnsapi
       - DB_SERVER_DATABASE=dnsapi
-      - JOBSERVER_HOST=gearman
-      - JOBSERVER_TYPE=gearman
       - REDIS_HOST=redis
       - INFLUX_HOST=influxdb
       - RABBITMQ_HOST=rabbitmq
@@ -137,8 +135,6 @@ services:
       - DB_SERVER_PASSWORD=dnsapi
       - DB_SERVER_DATABASE=dnsapi
       - REDIS_HOST=redis
-      - JOBSERVER_HOST=gearman
-      - JOBSERVER_TYPE=gearman
       - RABBITMQ_HOST=rabbitmq
     restart: always
     networks:
@@ -169,8 +165,6 @@ services:
       - REDIS_HOST=redis
       - INFLUX_HOST=influxdb
       - DNSSEC_DSKEY_FILES=/bind/keys
-      - JOBSERVER_HOST=gearman
-      - JOBSERVER_TYPE=gearman
       - WORKER_WORKERS=*,-verify_2fa_push,-call_domain_hooks
       - RABBITMQ_HOST=rabbitmq
     restart: always
@@ -178,7 +172,6 @@ services:
       - mydnshost-internal
     depends_on:
       - api
-      - gearman
     volumes:
       - bind-data:/bind
       - ./api-config.local.php:/dnsapi/config.local.php
@@ -196,8 +189,6 @@ services:
       - DB_SERVER_USERNAME=dnsapi
       - DB_SERVER_PASSWORD=dnsapi
       - DB_SERVER_DATABASE=dnsapi
-      - JOBSERVER_HOST=gearman
-      - JOBSERVER_TYPE=gearman
       - WORKER_WORKERS=verify_2fa_push,call_domain_hooks
       - RABBITMQ_HOST=rabbitmq
       - REDIS_HOST=redis
@@ -206,7 +197,6 @@ services:
       - mydnshost-internal
     depends_on:
       - api
-      - gearman
     volumes:
       - bind-data:/bind
       - ./api-config.local.php:/dnsapi/config.local.php
@@ -332,18 +322,6 @@ services:
       - mydnshost-internal
     volumes:
       - redis-data:/data
-
-  gearman:
-    image: artefactual/gearmand:latest
-    container_name: mydnshost_gearman
-    hostname: gearman
-    domainname: mydnshost.co.uk
-    command: --queue-type=redis --redis-server=redis
-    depends_on:
-      - redis
-    restart: always
-    networks:
-      - mydnshost-internal
 
   rabbitmq:
     image: rabbitmq:management
