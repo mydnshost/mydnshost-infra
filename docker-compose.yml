@@ -355,8 +355,8 @@ services:
     networks:
       - mydnshost-internal
     volumes:
-      - rabbitmq_log:/var/log/rabbitmq
-      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq-log:/var/log/rabbitmq
+      - rabbitmq-data:/var/lib/rabbitmq
     labels:
       traefik.frontend.auth.basic.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
       traefik.frontend.rule: "Host:rabbitmq.dev.mydnshost.co.uk"
@@ -381,9 +381,9 @@ volumes:
 
   redis-data:
 
-  rabbitmq_log:
+  rabbitmq-log:
 
-  rabbitmq_data:
+  rabbitmq-data:
 
 networks:
 
