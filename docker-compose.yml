@@ -264,6 +264,7 @@ services:
       - INFLUX_HOST=influxdb
       - INFLUX_BIND_SLAVES=ns1=1.1.1.1, ns2=2.2.2.2, ns3=3.3.3.3
       - RABBITMQ_HOST=rabbitmq
+      - REDIS_HOST=redis
     volumes:
       - ./maintenance/output:/output
       - /var/run/docker.sock:/var/run/docker.sock
