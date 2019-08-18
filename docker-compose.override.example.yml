@@ -57,6 +57,9 @@ services:
       - MASTER=
       - SLAVES=
       - RNDCKEY=
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
 
   chronograf:
     environment:
