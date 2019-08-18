@@ -5,8 +5,6 @@ export COMPOSE_HTTP_TIMEOUT=600
 
 DIR="$(dirname "$(readlink -f "$0")")"
 
-export GIT_SSH="${DIR}/git-ssh"
-
 cd "${DIR}"
 
 # Our main project name
