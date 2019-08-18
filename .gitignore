@@ -10,3 +10,4 @@ api-config.local.php
 hooks.local.php
 frontend-config.local.php
 traefik/acme.json
+traefik/traefik.toml
