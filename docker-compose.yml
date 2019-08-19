@@ -149,7 +149,7 @@ services:
       traefik.frontend.errors.network.status: "500-599"
 
   joblogger:
-    image: mydnshost/mydnshost-api:latest
+    image: mydnshost/mydnshost-joblogger:latest
     container_name: mydnshost_joblogger
     hostname: joblogger
     domainname: mydnshost.co.uk
@@ -169,12 +169,11 @@ services:
       - rabbitmq
     volumes:
       - ./api-config.local.php:/dnsapi/config.local.php
-    command: /dnsapi/joblogger/JobLogger.php
     labels:
       mydnshost.log: "true"
 
   dispatcher:
-    image: mydnshost/mydnshost-api:latest
+    image: mydnshost/mydnshost-dispatcher:latest
     container_name: mydnshost_dispatcher
     hostname: dispatcher
     domainname: mydnshost.co.uk
@@ -194,12 +193,11 @@ services:
       - rabbitmq
     volumes:
       - ./api-config.local.php:/dnsapi/config.local.php
-    command: /dnsapi/dispatcher/JobDispatcher.php
     labels:
       mydnshost.log: "true"
 
   gmworker1:
-    image: mydnshost/mydnshost-api:latest
+    image: mydnshost/mydnshost-workers:latest
     container_name: mydnshost_gmworker1
     hostname: gmworker1
     domainname: mydnshost.co.uk
@@ -228,12 +226,11 @@ services:
       - bind-data:/bind
       - ./api-config.local.php:/dnsapi/config.local.php
       - ./rndc_rndc.conf:/etc/bind/rndc.conf
-    command: /dnsapi/tasks/TaskRunner.php
     labels:
       mydnshost.log: "true"
 
   gmworker2:
-    image: mydnshost/mydnshost-api:latest
+    image: mydnshost/mydnshost-workers:latest
     container_name: mydnshost_gmworker2
     hostname: gmworker2
     domainname: mydnshost.co.uk
@@ -255,7 +252,6 @@ services:
       - bind-data:/bind
       - ./api-config.local.php:/dnsapi/config.local.php
       - ./rndc_rndc.conf:/etc/bind/rndc.conf
-    command: /dnsapi/tasks/TaskRunner.php
     labels:
       mydnshost.log: "true"
 
