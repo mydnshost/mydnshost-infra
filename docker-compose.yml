@@ -25,7 +25,7 @@ services:
     networks:
       - mydnshost-internal
     volumes:
-     - ./logging/logstash.conf:/logstash.conf
+     - ./logstash/logstash.conf:/logstash.conf
 
   proxy:
     image: traefik:1.7
