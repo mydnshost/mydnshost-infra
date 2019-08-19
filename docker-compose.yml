@@ -122,6 +122,7 @@ services:
       - REDIS_HOST=redis
       - INFLUX_HOST=influxdb
       - RABBITMQ_HOST=rabbitmq
+      - MONGO_HOST=mongo
     restart: always
     networks:
       - mydnshost-internal
@@ -171,6 +172,23 @@ services:
       - ./api-config.local.php:/dnsapi/config.local.php
     labels:
       mydnshost.log: "true"
+
+  containerlogger:
+    image: mydnshost/mydnshost-containerlogger:latest
+    container_name: mydnshost_containerlogger
+    hostname: containerlogger
+    domainname: mydnshost.co.uk
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - MONGO_HOST=mongo
+    restart: always
+    networks:
+      - mydnshost-internal
+    depends_on:
+      - api
+      - rabbitmq
+    volumes:
+      - ./api-config.local.php:/dnsapi/config.local.php
 
   dispatcher:
     image: mydnshost/mydnshost-dispatcher:latest
@@ -384,6 +402,19 @@ services:
     labels:
       mydnshost.log: "true"
 
+  mongo:
+    image: mongo:latest
+    container_name: mydnshost_mongo
+    hostname: mongo
+    domainname: mydnshost.co.uk
+    restart: always
+    networks:
+      - mydnshost-internal
+    volumes:
+      - mongo-data:/data/db
+    labels:
+      mydnshost.log: "true"
+
   rabbitmq:
     image: rabbitmq:management
     container_name: mydnshost_rabbitmq
@@ -419,6 +450,8 @@ volumes:
   chronograf-data:
 
   redis-data:
+
+  mongo-data:
 
   rabbitmq-log:
 
