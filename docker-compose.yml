@@ -3,6 +3,30 @@
 version: '2.3'
 
 services:
+  logspout:
+    image: bekt/logspout-logstash:latest
+    restart: always
+    container_name: mydnshost_logspout
+    command: 'logstash://logger:5000?filter.labels=mydnshost.log:true'
+    environment:
+      - INACTIVITY_TIMEOUT=1m
+    networks:
+      - mydnshost-internal
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  logger:
+    image: logstash:7.3.0
+    restart: always
+    container_name: mydnshost_logger
+    command: -f /logstash.conf
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - mydnshost-internal
+    volumes:
+     - ./logging/logstash.conf:/logstash.conf
+
   proxy:
     image: traefik:1.7
     container_name: mydnshost_proxy
@@ -13,6 +37,7 @@ services:
       - ./traefik/traefik.toml:/traefik.toml
       - ./traefik/acme.json:/acme.json
     labels:
+      mydnshost.log: "true"
       traefik.frontend.auth.basic.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
       traefik.frontend.rule: "Host:traefik.dev.mydnshost.co.uk"
       traefik.frontend.redirect.permanent: "true"
@@ -35,6 +60,7 @@ services:
     volumes:
       - ./static-pages:/srv/http
     labels:
+      mydnshost.log: "true"
       # I'd really like to not have this, but traefik won't let me
       # have a backend-only container it insists on having a matching frontend.
       # So here we are...
@@ -66,6 +92,7 @@ services:
     volumes:
       - ./frontend-config.local.php:/dnsfrontend/config.local.php
     labels:
+      mydnshost.log: "true"
       traefik.enable: "true"
       traefik.frontend.rule: "Host:dev.mydnshost.co.uk,www.dev.mydnshost.co.uk"
       traefik.frontend.redirect.regex: "^https?://www.([^/]*)/(.*)"
@@ -107,6 +134,7 @@ services:
       - ./rndc_rndc.conf:/etc/bind/rndc.conf
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
+      mydnshost.log: "true"
       traefik.enable: "true"
       traefik.frontend.rule: "Host:devapi.mydnshost.co.uk"
       traefik.frontend.redirect.permanent: "true"
@@ -142,6 +170,8 @@ services:
     volumes:
       - ./api-config.local.php:/dnsapi/config.local.php
     command: /dnsapi/joblogger/JobLogger.php
+    labels:
+      mydnshost.log: "true"
 
   dispatcher:
     image: mydnshost/mydnshost-api:latest
@@ -165,6 +195,8 @@ services:
     volumes:
       - ./api-config.local.php:/dnsapi/config.local.php
     command: /dnsapi/dispatcher/JobDispatcher.php
+    labels:
+      mydnshost.log: "true"
 
   gmworker1:
     image: mydnshost/mydnshost-api:latest
@@ -197,6 +229,8 @@ services:
       - ./api-config.local.php:/dnsapi/config.local.php
       - ./rndc_rndc.conf:/etc/bind/rndc.conf
     command: /dnsapi/tasks/TaskRunner.php
+    labels:
+      mydnshost.log: "true"
 
   gmworker2:
     image: mydnshost/mydnshost-api:latest
@@ -222,6 +256,8 @@ services:
       - ./api-config.local.php:/dnsapi/config.local.php
       - ./rndc_rndc.conf:/etc/bind/rndc.conf
     command: /dnsapi/tasks/TaskRunner.php
+    labels:
+      mydnshost.log: "true"
 
   database:
     image: mysql:5.7
@@ -239,6 +275,7 @@ services:
     networks:
       - mydnshost-internal
     labels:
+      mydnshost.log: "true"
       uk.co.mydnshost.maintenance.db.backup: "true"
       uk.co.mydnshost.maintenance.db.user: "dnsapi"
       uk.co.mydnshost.maintenance.db.pass: "dnsapi"
@@ -270,6 +307,8 @@ services:
       - mydnshost-internal
     depends_on:
       - api
+    labels:
+      mydnshost.log: "true"
 
   bind:
     image: mydnshost/mydnshost-bind:latest
@@ -290,6 +329,8 @@ services:
     volumes:
       - bind-data:/bind
       - ./bind_rndc.conf:/etc/bind/rndc.controls.conf
+    labels:
+      mydnshost.log: "true"
 
   influxdb:
     image: influxdb:alpine
@@ -301,6 +342,8 @@ services:
       - mydnshost-internal
     volumes:
       - influxdb-data:/var/lib/influxdb
+    labels:
+      mydnshost.log: "true"
 
   chronograf:
     image: chronograf:alpine
@@ -329,6 +372,8 @@ services:
       traefik.frontend.headers.STSPreload: "true"
       traefik.backend: "chronograf"
       traefik.port: "8888"
+    labels:
+      mydnshost.log: "true"
 
   redis:
     image: redis:latest
@@ -340,6 +385,8 @@ services:
       - mydnshost-internal
     volumes:
       - redis-data:/data
+    labels:
+      mydnshost.log: "true"
 
   rabbitmq:
     image: rabbitmq:management
@@ -363,6 +410,7 @@ services:
       traefik.backend: "rabbitmq"
       traefik.port: "15672"
       traefik.enable: "true"
+      mydnshost.log: "true"
 
 volumes:
 
