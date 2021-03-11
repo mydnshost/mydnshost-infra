@@ -347,7 +347,7 @@ services:
       mydnshost.log: "true"
 
   influxdb:
-    image: influxdb:alpine
+    image: influxdb:1.8-alpine
     container_name: mydnshost_influxdb
     hostname: influxdb
     domainname: mydnshost.co.uk
