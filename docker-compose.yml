@@ -403,7 +403,7 @@ services:
       mydnshost.log: "true"
 
   mongo:
-    image: mongo:latest
+    image: mongo:4.4
     container_name: mydnshost_mongo
     hostname: mongo
     domainname: mydnshost.co.uk
