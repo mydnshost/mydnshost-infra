@@ -386,7 +386,6 @@ services:
       traefik.frontend.headers.STSPreload: "true"
       traefik.backend: "chronograf"
       traefik.port: "8888"
-    labels:
       mydnshost.log: "true"
 
   redis:
