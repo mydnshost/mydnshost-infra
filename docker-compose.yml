@@ -75,7 +75,7 @@ services:
       traefik.enable: "true"
 
   web:
-    image: registry.shanemcc.net/mydnshost-public/mydnshost-frontend:latest
+    image: registry.shanemcc.net/mydnshost-public/frontend:latest
     scale: 1
     hostname: www
     domainname: mydnshost.co.uk
@@ -109,7 +109,7 @@ services:
       traefik.frontend.errors.network.status: "500-599"
 
   api:
-    image: registry.shanemcc.net/mydnshost-public/mydnshost-api:latest
+    image: registry.shanemcc.net/mydnshost-public/api:latest
     scale: 1
     hostname: api
     domainname: mydnshost.co.uk
@@ -150,7 +150,7 @@ services:
       traefik.frontend.errors.network.status: "500-599"
 
   joblogger:
-    image: registry.shanemcc.net/mydnshost-public/mydnshost-joblogger:latest
+    image: registry.shanemcc.net/mydnshost-public/joblogger:latest
     container_name: mydnshost_joblogger
     hostname: joblogger
     domainname: mydnshost.co.uk
@@ -174,7 +174,7 @@ services:
       mydnshost.log: "true"
 
   containerlogger:
-    image: registry.shanemcc.net/mydnshost-public/mydnshost-containerlogger:latest
+    image: registry.shanemcc.net/mydnshost-public/containerlogger:latest
     container_name: mydnshost_containerlogger
     hostname: containerlogger
     domainname: mydnshost.co.uk
@@ -191,7 +191,7 @@ services:
       - ./api-config.local.php:/dnsapi/config.local.php
 
   dispatcher:
-    image: registry.shanemcc.net/mydnshost-public/mydnshost-dispatcher:latest
+    image: registry.shanemcc.net/mydnshost-public/dispatcher:latest
     container_name: mydnshost_dispatcher
     hostname: dispatcher
     domainname: mydnshost.co.uk
@@ -215,7 +215,7 @@ services:
       mydnshost.log: "true"
 
   gmworker1:
-    image: registry.shanemcc.net/mydnshost-public/mydnshost-workers:latest
+    image: registry.shanemcc.net/mydnshost-public/workers:latest
     container_name: mydnshost_gmworker1
     hostname: gmworker1
     domainname: mydnshost.co.uk
@@ -248,7 +248,7 @@ services:
       mydnshost.log: "true"
 
   gmworker2:
-    image: registry.shanemcc.net/mydnshost-public/mydnshost-workers:latest
+    image: registry.shanemcc.net/mydnshost-public/workers:latest
     container_name: mydnshost_gmworker2
     hostname: gmworker2
     domainname: mydnshost.co.uk
@@ -296,7 +296,7 @@ services:
       uk.co.mydnshost.maintenance.db.dbs: "dnsapi"
 
   maintenance:
-    image: registry.shanemcc.net/mydnshost-public/mydnshost-maintenance:latest
+    image: registry.shanemcc.net/mydnshost-public/maintenance:latest
     container_name: mydnshost_maintenance
     hostname: maintenance
     domainname: mydnshost.co.uk
@@ -325,7 +325,7 @@ services:
       mydnshost.log: "true"
 
   bind:
-    image: registry.shanemcc.net/mydnshost-public/mydnshost-bind:latest
+    image: registry.shanemcc.net/mydnshost-public/bind:latest
     container_name: mydnshost_bind
     hostname: bind
     domainname: mydnshost.co.uk
