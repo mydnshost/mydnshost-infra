@@ -342,7 +342,7 @@ services:
       - api
     volumes:
       - bind-data:/bind
-      - bind-data:/bind/data
+      - bind-data:/etc/bind/data
       - ./bind_rndc.conf:/etc/bind/rndc.controls.conf
     labels:
       mydnshost.log: "true"
