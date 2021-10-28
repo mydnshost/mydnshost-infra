@@ -29,8 +29,8 @@ function prepareAPIContainers() {
 	done;
 }
 
-api_VERSION=`docker inspect $(docker images mydnshost/mydnshost-api --format "{{.ID}}") | "${DIR}/jq" .[0].Id`
-web_VERSION=`docker inspect $(docker images mydnshost/mydnshost-frontend --format "{{.ID}}") | "${DIR}/jq" .[0].Id`
+api_VERSION=`docker inspect $(docker images registry.shanemcc.net/mydnshost-public/api:latest --format "{{.ID}}") | "${DIR}/jq" .[0].Id`
+web_VERSION=`docker inspect $(docker images registry.shanemcc.net/mydnshost-public/frontend:latest --format "{{.ID}}") | "${DIR}/jq" .[0].Id`
 
 # Create any needed containers.
 # echo 'Creating...';
