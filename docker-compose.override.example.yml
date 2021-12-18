@@ -7,7 +7,7 @@ services:
     command: --acme.email="<email>"
     labels:
       traefik.frontend.auth.basic.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
-      traefik.frontend.rule: "Host:<VHOST>"
+      traefik.frontend.rule: "Host:traefik.somehost"
 
   static:
     labels:
@@ -19,7 +19,7 @@ services:
       - RECAPTCHA_SITE=
       - RECAPTCHA_SECRET=
     labels:
-      traefik.frontend.rule: "Host:<VHOST>"
+      traefik.frontend.rule: "Host:somehost"
 
   api:
     labels:
@@ -69,9 +69,9 @@ services:
       - GH_CLIENT_SECRET=
       - GH_ORGS=
     labels:
-      traefik.frontend.rule: "Host:<VHOST>"
+      traefik.frontend.rule: "Host:chronograf.somehost"
 
   rabbitmq:
     labels:
       traefik.frontend.auth.basic.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
-      traefik.frontend.rule: "Host:<VHOST>"
+      traefik.frontend.rule: "Host:rabbitmq.somehost"

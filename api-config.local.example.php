@@ -4,6 +4,7 @@
 	$config['hooks']['bind']['catalogZoneName'] = 'catalog.invalid';
 	$config['hooks']['bind']['zonedir'] = '/bind/zones';
 	$config['hooks']['bind']['keydir'] = '/bind/keys';
+	$config['hooks']['bind']['slaveServers'] = ['10.0.0.1', '10.0.0.2', '10.0.0.3'];
 
 	$config['defaultRecords'] = [];
 	$config['defaultRecords'][] = ['name' => '', 'type' => 'NS', 'content' => 'ns1.mydnshost.co.uk'];
