@@ -35,7 +35,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./traefik/traefik.yaml:/traefik.yaml
-      - ./traefik/acme2.json:/acme.json
+      - ./traefik/acme.json:/acme.json
     labels:
       mydnshost.log: "true"
       traefik.http.middlewares.proxy-auth.basicauth.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"

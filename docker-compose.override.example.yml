@@ -4,7 +4,6 @@ version: '2.3'
 
 services:
   proxy:
-    command: --acme.email="<email>"
     labels:
       traefik.http.middlewares.proxy-auth.basicauth.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
       traefik.http.routers.proxy.rule: "Host:<VHOST>"
