@@ -28,25 +28,24 @@ services:
      - ./logstash/logstash.conf:/logstash.conf
 
   proxy:
-    image: traefik:1.7
+    image: traefik:latest
     container_name: mydnshost_proxy
     restart: always
     network_mode: host
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./traefik/traefik.toml:/traefik.toml
-      - ./traefik/acme.json:/acme.json
+      - ./traefik/traefik.yaml:/traefik.yaml
+      - ./traefik/acme2.json:/acme.json
     labels:
       mydnshost.log: "true"
-      traefik.frontend.auth.basic.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
-      traefik.frontend.rule: "Host:traefik.dev.mydnshost.co.uk"
-      traefik.frontend.redirect.permanent: "true"
-      traefik.frontend.redirect.entryPoint: "https"
-      traefik.frontend.headers.STSSeconds: "31536000"
-      traefik.frontend.headers.STSIncludeSubdomains: "true"
-      traefik.frontend.headers.STSPreload: "true"
-      traefik.backend: "traefik"
-      traefik.port: "8090"
+      traefik.http.middlewares.proxy-auth.basicauth.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
+      traefik.http.routers.proxy.rule: "Host(`traefik.dev.mydnshost.co.uk`)"
+      traefik.http.routers.proxy.service: "api@internal"
+      traefik.http.routers.proxy.middlewares: "security-headers, proxy-auth"
+      traefik.http.services.proxy-service.loadbalancer.server.port: "443"
+      traefik.http.middlewares.security-headers.headers.stsSeconds: "31536000"
+      traefik.http.middlewares.security-headers.headers.stsPreload: "true"
+      traefik.http.middlewares.security-headers.headers.stsIncludeSubdomains: "true"
       traefik.enable: "true"
 
   static:
@@ -64,14 +63,9 @@ services:
       # I'd really like to not have this, but traefik won't let me
       # have a backend-only container it insists on having a matching frontend.
       # So here we are...
-      traefik.frontend.rule: "Host:static.dev.mydnshost.co.uk"
-      traefik.frontend.redirect.permanent: "true"
-      traefik.frontend.redirect.entryPoint: "https"
-      traefik.frontend.headers.STSSeconds: "31536000"
-      traefik.frontend.headers.STSIncludeSubdomains: "true"
-      traefik.frontend.headers.STSPreload: "true"
-      traefik.backend: "static"
-      traefik.port: "8043"
+      traefik.http.routers.static.rule: "Host(`static.dev.mydnshost.co.uk`)"
+      traefik.http.routers.static.middlewares: "security-headers"
+      traefik.http.services.static.loadbalancer.server.port: "8043"
       traefik.enable: "true"
 
   web:
@@ -94,19 +88,14 @@ services:
     labels:
       mydnshost.log: "true"
       traefik.enable: "true"
-      traefik.frontend.rule: "Host:dev.mydnshost.co.uk,www.dev.mydnshost.co.uk"
-      traefik.frontend.redirect.regex: "^https?://www.([^/]*)/(.*)"
-      traefik.frontend.redirect.replacement: "https://$${1}/$${2}"
-      traefik.frontend.redirect.permanent: "true"
-      traefik.frontend.redirect.entryPoint: "https"
-      traefik.frontend.headers.STSSeconds: "31536000"
-      traefik.frontend.headers.STSIncludeSubdomains: "true"
-      traefik.frontend.headers.STSPreload: "true"
-      traefik.backend: "web"
-      traefik.port: "80"
-      traefik.frontend.errors.network.backend: "static"
-      traefik.frontend.errors.network.query: "/web-error.html"
-      traefik.frontend.errors.network.status: "500-599"
+      traefik.http.routers.web.rule: "Host(`dev.mydnshost.co.uk`) || Host(`www.dev.mydnshost.co.uk`)"
+      traefik.http.middlewares.web-nowww.redirectregex.regex: "^https?://www.([^/]*)/(.*)"
+      traefik.http.middlewares.web-nowww.redirectregex.replacement: "https://$${1}/$${2}"
+      traefik.http.routers.web.middlewares: "security-headers, web-errorpage, web-nowww"
+      traefik.http.services.web.loadbalancer.server.port: "80"
+      traefik.http.middlewares.web-errorpage.errors.status: "500-599"
+      traefik.http.middlewares.web-errorpage.errors.service: "static"
+      traefik.http.middlewares.web-errorpage.errors.query: "/web-error.html"
 
   api:
     image: registry.shanemcc.net/mydnshost-public/api:latest
@@ -137,17 +126,12 @@ services:
     labels:
       mydnshost.log: "true"
       traefik.enable: "true"
-      traefik.frontend.rule: "Host:devapi.mydnshost.co.uk"
-      traefik.frontend.redirect.permanent: "true"
-      traefik.frontend.redirect.entryPoint: "https"
-      traefik.frontend.headers.STSSeconds: "31536000"
-      traefik.frontend.headers.STSIncludeSubdomains: "true"
-      traefik.frontend.headers.STSPreload: "true"
-      traefik.backend: "api"
-      traefik.port: "80"
-      traefik.frontend.errors.network.backend: "static"
-      traefik.frontend.errors.network.query: "/api-error.json"
-      traefik.frontend.errors.network.status: "500-599"
+      traefik.http.routers.api.rule: "Host(`devapi.mydnshost.co.uk`)"
+      traefik.http.routers.api.middlewares: "security-headers, api-errorpage"
+      traefik.http.services.api.loadbalancer.server.port: "80"
+      traefik.http.middlewares.api-errorpage.errors.status: "500-599"
+      traefik.http.middlewares.api-errorpage.errors.service: "static"
+      traefik.http.middlewares.api-errorpage.errors.query: "/api-error.json"
 
   joblogger:
     image: registry.shanemcc.net/mydnshost-public/joblogger:latest
@@ -379,14 +363,9 @@ services:
       - INFLUXDB_URL=http://influxdb:8086/
     labels:
       traefik.enable: "true"
-      traefik.frontend.rule: "Host:chronograf.dev.mydnshost.co.uk"
-      traefik.frontend.redirect.permanent: "true"
-      traefik.frontend.redirect.entryPoint: "https"
-      traefik.frontend.headers.STSSeconds: "31536000"
-      traefik.frontend.headers.STSIncludeSubdomains: "true"
-      traefik.frontend.headers.STSPreload: "true"
-      traefik.backend: "chronograf"
-      traefik.port: "8888"
+      traefik.http.routers.chronograf.rule: "Host(`chronograf.dev.mydnshost.co.uk`)"
+      traefik.http.routers.chronograf.middlewares: "security-headers"
+      traefik.http.services.chronograf.loadbalancer.server.port: "8888"
       mydnshost.log: "true"
 
   redis:
@@ -427,15 +406,11 @@ services:
       - rabbitmq-log:/var/log/rabbitmq
       - rabbitmq-data:/var/lib/rabbitmq
     labels:
-      traefik.frontend.auth.basic.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
-      traefik.frontend.rule: "Host:rabbitmq.dev.mydnshost.co.uk"
-      traefik.frontend.redirect.permanent: "true"
-      traefik.frontend.redirect.entryPoint: "https"
-      traefik.frontend.headers.STSSeconds: "31536000"
-      traefik.frontend.headers.STSIncludeSubdomains: "true"
-      traefik.frontend.headers.STSPreload: "true"
-      traefik.backend: "rabbitmq"
-      traefik.port: "15672"
+      traefik.http.middlewares.rabbitmq-auth.basicauth.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
+      traefik.http.routers.rabbitmq.rule: "Host(`rabbitmq.dev.mydnshost.co.uk`)"
+      traefik.http.routers.rabbitmq.middlewares: "rabbitmq-auth"
+      traefik.http.routers.rabbitmq.middlewares: "security-headers"
+      traefik.http.services.rabbitmq.loadbalancer.server.port: "15672"
       traefik.enable: "true"
       mydnshost.log: "true"
 

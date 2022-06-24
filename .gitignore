@@ -12,4 +12,5 @@ hooks.local.php
 frontend-config.local.php
 traefik/acme.json
 traefik/traefik.toml
+traefik/traefik.yaml
 logstash/logstash.conf
