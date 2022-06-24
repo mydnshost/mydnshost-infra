@@ -4,9 +4,6 @@ providers:
     exposedByDefault: false
     watch: true
 
-log:
-  level: DEBUG
-
 entryPoints:
   http:
     address: :80
