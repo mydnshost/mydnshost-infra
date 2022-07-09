@@ -4,25 +4,29 @@ version: '2.3'
 
 services:
   proxy:
+    command: --acme.email="example@example.org"
     labels:
       traefik.http.middlewares.proxy-auth.basicauth.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
-      traefik.http.routers.proxy.rule: "Host:<VHOST>"
+      traefik.http.routers.proxy.rule: "Host(`traefik.<VHOST>`)"
 
   static:
     labels:
-      traefik.http.routers.static.rule: "Host:static.somehost"
+      traefik.http.routers.static.rule: "Host(`static.<VHOST>`)"
 
   web:
     environment:
-      - API_PUBLICURL=https://api.somehost/
+      - API_PUBLICURL=https://api.<VHOST>/
       - RECAPTCHA_SITE=
       - RECAPTCHA_SECRET=
     labels:
-      traefik.http.routers.web.rule: "Host:<VHOST>"
+      traefik.http.routers.web.rule: "Host(`<VHOST>`) || Host(`www.<VHOST>`)"
+
 
   api:
     labels:
-      traefik.http.routers.api.rule: "Host:api.somehost"
+      traefik.http.routers.api.rule: "Host(`api.<VHOST>`) || Host(`api4.<VHOST>`) || Host(`api6.<VHOST>`)"
+      traefik.http.routers.httpreq.rule: "Host(`httpreq.experimental.api.<VHOST>`) || Host(`httpreq.experimental.api4.<VHOST>`) || Host(`httpreq.experimental.api6.<VHOST>`)"
+      traefik.http.routers.ddns.rule: "Host(`ddns.experimental.api.<VHOST>`) || Host(`ddns.experimental.api4.<VHOST>`) || Host(`ddns.experimental.api6.<VHOST>`)"
 
   gmworker1:
     environment:
@@ -68,9 +72,9 @@ services:
       - GH_CLIENT_SECRET=
       - GH_ORGS=
     labels:
-      traefik.http.routers.chronograf.rule: "Host:<VHOST>"
+      traefik.http.routers.chronograf.rule: "Host(`chronograf.<VHOST>`)"
 
   rabbitmq:
     labels:
       traefik.http.middlewares.rabbitmq-auth.basicauth.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
-      traefik.http.routers.rabbitmq.rule: "Host:<VHOST>"
+      traefik.http.routers.rabbitmq.rule: "Host(`rabbitmq.<VHOST>`)"
