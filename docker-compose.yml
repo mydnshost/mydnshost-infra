@@ -395,7 +395,7 @@ services:
       mydnshost.log: "true"
 
   rabbitmq:
-    image: rabbitmq:management
+    image: rabbitmq:3.10-management
     container_name: mydnshost_rabbitmq
     hostname: rabbitmq
     domainname: mydnshost.co.uk
@@ -405,6 +405,8 @@ services:
     volumes:
       - rabbitmq-log:/var/log/rabbitmq
       - rabbitmq-data:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_FEATURE_FLAGS=quorum_queue,implicit_default_bindings,virtual_host_metadata,maintenance_mode_status,user_limits
     labels:
       traefik.http.middlewares.rabbitmq-auth.basicauth.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
       traefik.http.routers.rabbitmq.rule: "Host(`rabbitmq.dev.mydnshost.co.uk`)"
