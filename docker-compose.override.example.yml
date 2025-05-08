@@ -1,7 +1,5 @@
 ---
 
-version: '2.3'
-
 services:
   proxy:
     command: --acme.email="example@example.org"

@@ -29,6 +29,8 @@ done;
 
 # Now actually migrate things if needed.
 if [ "${MIGRATION_NEEDED}" == "1" ]; then
+    echo "Volume migration is needed."
+
     if [ $(id -u) != 0 ]; then
         echo "Migrate-volumes script needs to run as root to actually migrate volumes."
         exit 1;

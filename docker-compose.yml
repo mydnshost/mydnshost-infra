@@ -1,7 +1,5 @@
 ---
 
-version: '2.3'
-
 services:
   logspout:
     image: bekt/logspout-logstash:latest
