@@ -13,9 +13,15 @@ export COMPOSE_PROJECT_NAME=mydnshost
 touch traefik/acme.json
 chmod 600 traefik/acme.json
 
+docker compose >/dev/null 2>&1
+if [ ${?} -ne 0 ]; then
+	echo "Docker Compose v2 is required for this script."
+	exit 1;
+fi;
+
 # Update images
 echo 'Updating images...';
-docker-compose pull
+docker compose pull
 # cat docker-compose.yml docker-compose.override.yml | grep -i "image:" | sort -u | awk '{print $2}' | while read IMAGE; do docker pull ${IMAGE}; done
 # docker pull mydnshost/mydnshost-api
 # docker pull mydnshost/mydnshost-frontend
@@ -38,7 +44,7 @@ web_VERSION=`docker inspect $(docker images registry.shanemcc.net/mydnshost-publ
 
 # Rebuild running stateless containers if needed by scaling up then killing off the older containers.
 for IMAGE in api web; do
-        RUNNING=`docker-compose ps "${IMAGE}" | grep " Up "`
+        RUNNING=`docker compose ps "${IMAGE}" | grep " Up "`
         if [ "" != "${RUNNING}" ]; then
 		echo 'Checking '${IMAGE}'...';
 		NEED_UPGRADE="0";
@@ -54,14 +60,14 @@ for IMAGE in api web; do
 			else
 				echo "${NAME} is up to date."
 			fi;
-		done <<< $(docker-compose ps "${IMAGE}" | grep " Up " | awk '{print $1}')
+		done <<< $(docker compose ps "${IMAGE}" | grep " Up " | awk '{print $1}')
 
 		if [ "${NEED_UPGRADE}" = "1" ]; then
 			echo 'Updating with scale...';
 
 			# Scale up to 2 to start new container.
 			echo 'Scaling up container: '"${NAME}";
-	                docker-compose up -d --no-deps --no-recreate --scale "${IMAGE}"=2 "${IMAGE}"
+	        docker compose up -d --no-deps --no-recreate --scale "${IMAGE}"=2 "${IMAGE}"
 
 			# Prepare all containers
 			# if [ "${IMAGE}" = "api" ]; then
@@ -73,7 +79,7 @@ for IMAGE in api web; do
 
 			echo 'Scaling back down...';
 			# Kill off older containers.
-			docker-compose ps "${IMAGE}" | grep " Up " | sort -V | head -n -1 | awk '{print $1}' | while read NAME; do
+			docker compose ps "${IMAGE}" | grep " Up " | sort -V | head -n -1 | awk '{print $1}' | while read NAME; do
 				echo 'Stopping older container: '"${NAME}";
 				ID=`docker ps --filter name="${NAME}" --format {{.ID}}`
 				docker stop "${ID}"
@@ -85,17 +91,17 @@ done;
 
 # Rebuild any single-instance containers if needed.
 for IMAGE in bind maintenance; do
-	RUNNING=`docker-compose ps "${IMAGE}" | grep " Up "`
+	RUNNING=`docker compose ps "${IMAGE}" | grep " Up "`
 	if [ "" != "${RUNNING}" ]; then
 		echo 'Checking '${IMAGE}'...';
-		docker-compose up -d --no-deps "${IMAGE}"
+		docker compose up -d --no-deps "${IMAGE}"
 	fi;
 done;
 
-DB_RUNNING=`docker-compose ps database | grep " Up "`
+DB_RUNNING=`docker compose ps database | grep " Up "`
 
 echo "Starting all..."
-docker-compose up -d --remove-orphans
+docker compose up -d --remove-orphans
 
 
 # if [ "" = "${DB_RUNNING}" ]; then
