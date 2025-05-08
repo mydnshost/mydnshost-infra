@@ -17,11 +17,6 @@ for vol in ${legacyVolumes[@]}; do
         exit 1;
     fi;
 
-    if [ "${VOLPATH}" == "" -a ! -e "volumes/${vol}" ]; then
-        echo "Error - Volume for ${vol} does not exist, but neither does bind-mount path. Aborting."
-        exit 1;
-    fi;
-
     if [ "${VOLPATH}" != "" -a ! -e "volumes/${vol}" ]; then
         MIGRATION_NEEDED="1"
     fi;
