@@ -35,6 +35,32 @@ if [ ${?} -ne 0 ]; then
 	exit 1;
 fi;
 
+# Ensure volumes exist with correct permissions
+uid0Volumes=(chronograf-data influxdb-data)
+uid33Volumes=(bind-data)
+uid999Volumes=(db-data mongo-data rabbitmq-data rabbitmq-log redis-data)
+
+for vol in ${uid0Volumes[@]}; do
+    if [ ! -e "./volumes/${vol}" ]; then
+		mkdir "./volumes/${vol}"
+		chown 0:0 "./volumes/${vol}"
+	fi;
+done;
+
+for vol in ${uid33Volumes[@]}; do
+    if [ ! -e "./volumes/${vol}" ]; then
+		mkdir "./volumes/${vol}"
+		chown 33:33 "./volumes/${vol}"
+	fi;
+done;
+
+for vol in ${uid999Volumes[@]}; do
+    if [ ! -e "./volumes/${vol}" ]; then
+		mkdir "./volumes/${vol}"
+		chown 999:999 "./volumes/${vol}"
+	fi;
+done;
+
 function prepareAPIContainers() {
 	docker ps -a --format '{{.Names}}' | grep -i mydnshost_api_ | while read NAME; do
 		docker exec -t "${NAME}" chown www-data: /bind
