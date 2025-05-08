@@ -28,6 +28,13 @@ docker compose pull
 # docker pull mydnshost/mydnshost-bind
 # docker pull mydnshost/mydnshost-docker-cron
 
+# Check for volume migrations.
+./migrate-volumes.sh
+if [ ${?} -ne 0 ]; then
+	echo "Volume migration failed, stopping."
+	exit 1;
+fi;
+
 function prepareAPIContainers() {
 	docker ps -a --format '{{.Names}}' | grep -i mydnshost_api_ | while read NAME; do
 		docker exec -t "${NAME}" chown www-data: /bind
