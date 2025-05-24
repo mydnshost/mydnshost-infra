@@ -307,7 +307,7 @@ services:
       mydnshost.log: "true"
 
   bind:
-    image: registry.shanemcc.net/mydnshost-public/bind:latest
+    image: registry.shanemcc.net/mydnshost-public/bind:9.16.21
     container_name: mydnshost_bind
     hostname: bind
     domainname: mydnshost.co.uk
