@@ -20,6 +20,7 @@ services:
     command: -f /logstash.conf
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+      XPACK_MONITORING_ENABLED: "false"
     networks:
       - mydnshost-internal
     volumes:
