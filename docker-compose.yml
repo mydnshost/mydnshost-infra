@@ -257,11 +257,12 @@ services:
       mydnshost.log: "true"
 
   database:
-    image: mysql:5.7
+    image: mariadb:12.2
     container_name: mydnshost_database
     hostname: database
     domainname: mydnshost.co.uk
     environment:
+      - MARIADB_AUTO_UPGRADE=1
       - MYSQL_USER=dnsapi
       - MYSQL_PASSWORD=dnsapi
       - MYSQL_DATABASE=dnsapi
