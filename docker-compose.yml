@@ -197,6 +197,30 @@ services:
     labels:
       mydnshost.log: "true"
 
+  auditlogger:
+    image: registry.shanemcc.net/mydnshost-public/auditlogger:latest
+    container_name: mydnshost_auditlogger
+    hostname: auditlogger
+    domainname: mydnshost.co.uk
+    environment:
+      - DB_SERVER=database
+      - DB_SERVER_TYPE=mysql
+      - DB_SERVER_USERNAME=dnsapi
+      - DB_SERVER_PASSWORD=dnsapi
+      - DB_SERVER_DATABASE=dnsapi
+      - REDIS_HOST=redis
+      - RABBITMQ_HOST=rabbitmq
+    restart: always
+    networks:
+      - mydnshost-internal
+    depends_on:
+      - api
+      - rabbitmq
+    volumes:
+      - ./api-config.local.php:/dnsapi/config.local.php
+    labels:
+      mydnshost.log: "true"
+
   gmworker1:
     image: registry.shanemcc.net/mydnshost-public/workers:latest
     container_name: mydnshost_gmworker1
