@@ -312,6 +312,15 @@ services:
       - MYSQL_DATABASE=dnsapi
       - MYSQL_ROOT_PASSWORD=isukr7hgtistg
     restart: always
+    # update.sh waits for this before rolling api/web. --connect only checks
+    # the server accepts TCP connections, so needs no working credentials.
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 300s
+      start_interval: 1s
     volumes:
       - ./volumes/db-data:/var/lib/mysql
     networks:

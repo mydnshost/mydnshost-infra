@@ -98,8 +98,9 @@ function waitForHealth() {
 			return 0;
 		fi;
 
-		# Don't wait around for a new container that has already failed.
-		if [ "${WANT}" = "healthy" ] && { [ "${STATE}" = "unhealthy" ] || [ "${STATE}" = "exited" ]; }; then
+		# Don't wait around for a container that has already failed. (Exiting
+		# isn't fatal, restart: always will bring it back.)
+		if [ "${WANT}" = "healthy" ] && [ "${STATE}" = "unhealthy" ]; then
 			return 1;
 		fi;
 
@@ -202,6 +203,20 @@ OTHER_SERVICES=$(docker compose config --services | grep -vxF "$(printf '%s\n' "
 
 echo "Starting all..."
 docker compose up -d --no-deps --remove-orphans ${OTHER_SERVICES}
+
+# Anything with a healthcheck (eg the database) needs to be up before new
+# api/web containers can start properly.
+for SERVICE in ${OTHER_SERVICES}; do
+	for ID in $(docker compose ps -q "${SERVICE}"); do
+		if [ "$(containerHealth "${ID}")" != "none" ]; then
+			echo "Waiting for ${SERVICE} to become healthy..."
+			if ! waitForHealth "${ID}" healthy "${HEALTH_TIMEOUT}"; then
+				echo "${SERVICE} did not become healthy ($(containerHealth "${ID}")), stopping."
+				exit 1;
+			fi;
+		fi;
+	done;
+done;
 
 for SERVICE in "${ROLLING_SERVICES[@]}"; do
 	rollingUpdate "${SERVICE}"
