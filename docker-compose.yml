@@ -27,7 +27,7 @@ services:
      - ./logstash/logstash.conf:/logstash.conf
 
   proxy:
-    image: traefik:latest
+    image: traefik:v3.7.14
     container_name: mydnshost_proxy
     restart: always
     network_mode: host
