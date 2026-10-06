@@ -3,6 +3,7 @@ providers:
     endpoint: unix:///var/run/docker.sock
     exposedByDefault: false
     watch: true
+    allowEmptyServices: true
 
 entryPoints:
   http:

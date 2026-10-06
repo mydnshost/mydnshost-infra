@@ -68,78 +68,141 @@ function prepareAPIContainers() {
 	done;
 }
 
-api_VERSION=`docker inspect $(docker images registry.shanemcc.net/mydnshost-public/api:latest --format "{{.ID}}") | "${DIR}/jq" .[0].Id`
-web_VERSION=`docker inspect $(docker images registry.shanemcc.net/mydnshost-public/frontend:latest --format "{{.ID}}") | "${DIR}/jq" .[0].Id`
+# Services that get a rolling (scale up, wait for healthy, drain old) update.
+ROLLING_SERVICES=(api web)
 
-# Create any needed containers.
-# echo 'Creating...';
-# docker-compose up --no-start
+# How long to wait for a new container to become healthy.
+HEALTH_TIMEOUT=300
+# How long to wait for a draining container to be marked unhealthy.
+DRAIN_TIMEOUT=30
+# Time for traefik to react to a health change (providersThrottleDuration
+# defaults to 2s, so this gives it some slack).
+TRAEFIK_GRACE=5
 
-# Rebuild running stateless containers if needed by scaling up then killing off the older containers.
-for IMAGE in api web; do
-        RUNNING=`docker compose ps "${IMAGE}" | grep " Up "`
-        if [ "" != "${RUNNING}" ]; then
-		echo 'Checking '${IMAGE}'...';
-		NEED_UPGRADE="0";
+# Echo the health state of a container (starting, healthy, unhealthy), "none"
+# if it has no healthcheck, or "exited" if it is no longer running.
+function containerHealth() {
+	docker inspect --format '{{if not .State.Running}}exited{{else if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' "${1}" 2>/dev/null || echo "exited"
+}
 
-		while read NAME; do
-			ID=`docker ps --filter name="${NAME}" --format {{.ID}}`
-			MY_VERSION=`docker inspect "${ID}" | "${DIR}/jq" .[0].Image`
-			IMAGE_VERSION="${IMAGE}_VERSION"
+# Wait for a container to reach the given health state.
+function waitForHealth() {
+	local ID="${1}"
+	local WANT="${2}"
+	local TIMEOUT="${3}"
+	local END=$(( $(date +%s) + TIMEOUT ))
 
-			if [ "${MY_VERSION}" != "${!IMAGE_VERSION}" ]; then
-				echo "${NAME} needs upgrading."
-				NEED_UPGRADE="1"
-			else
-				echo "${NAME} is up to date."
-			fi;
-		done <<< $(docker compose ps "${IMAGE}" | grep " Up " | awk '{print $1}')
-
-		if [ "${NEED_UPGRADE}" = "1" ]; then
-			echo 'Updating with scale...';
-
-			# Scale up to 2 to start new container.
-			echo 'Scaling up container: '"${NAME}";
-	        docker compose up -d --no-deps --no-recreate --scale "${IMAGE}"=2 "${IMAGE}"
-
-			# Prepare all containers
-			# if [ "${IMAGE}" = "api" ]; then
-			# 	prepareAPIContainers;
-			# fi;
-
-			# Wait for traefik
-			sleep 2;
-
-			echo 'Scaling back down...';
-			# Kill off older containers.
-			docker compose ps "${IMAGE}" | grep " Up " | sort -V | head -n -1 | awk '{print $1}' | while read NAME; do
-				echo 'Stopping older container: '"${NAME}";
-				ID=`docker ps --filter name="${NAME}" --format {{.ID}}`
-				docker stop "${ID}"
-				docker rm -f "${ID}"
-			done;
+	while [ "$(date +%s)" -lt "${END}" ]; do
+		local STATE=$(containerHealth "${ID}")
+		if [ "${STATE}" = "${WANT}" ]; then
+			return 0;
 		fi;
-        fi;
-done;
 
-# Rebuild any single-instance containers if needed.
-for IMAGE in bind maintenance; do
-	RUNNING=`docker compose ps "${IMAGE}" | grep " Up "`
-	if [ "" != "${RUNNING}" ]; then
-		echo 'Checking '${IMAGE}'...';
-		docker compose up -d --no-deps "${IMAGE}"
+		# Don't wait around for a new container that has already failed.
+		if [ "${WANT}" = "healthy" ] && { [ "${STATE}" = "unhealthy" ] || [ "${STATE}" = "exited" ]; }; then
+			return 1;
+		fi;
+
+		sleep 1;
+	done;
+
+	return 1;
+}
+
+# Check if a container differs from what compose would create now, either
+# because the image has been updated or the service config has changed.
+function needsUpgrade() {
+	local SERVICE="${1}"
+	local ID="${2}"
+
+	local WANT_HASH=$(docker compose config --hash "${SERVICE}" | awk '{print $2}')
+	local HAVE_HASH=$(docker inspect --format '{{index .Config.Labels "com.docker.compose.config-hash"}}' "${ID}")
+	local WANT_IMAGE=$(docker image inspect --format '{{.Id}}' "$(docker inspect --format '{{.Config.Image}}' "${ID}")")
+	local HAVE_IMAGE=$(docker inspect --format '{{.Image}}' "${ID}")
+
+	[ "${WANT_HASH}" != "${HAVE_HASH}" ] || [ "${WANT_IMAGE}" != "${HAVE_IMAGE}" ]
+}
+
+function rollingUpdate() {
+	local SERVICE="${1}"
+	local OLD_IDS=$(docker compose ps -q --status running "${SERVICE}")
+
+	if [ "" = "${OLD_IDS}" ]; then
+		echo "${SERVICE} is not running, starting...";
+		docker compose up -d --no-deps "${SERVICE}"
+		return;
 	fi;
-done;
 
-DB_RUNNING=`docker compose ps database | grep " Up "`
+	echo 'Checking '"${SERVICE}"'...';
+	local NEED_UPGRADE="0";
+	for ID in ${OLD_IDS}; do
+		if needsUpgrade "${SERVICE}" "${ID}"; then
+			echo "${SERVICE} (${ID:0:12}) needs upgrading."
+			NEED_UPGRADE="1"
+		fi;
+	done;
+
+	if [ "${NEED_UPGRADE}" = "0" ]; then
+		echo "${SERVICE} is up to date."
+		return;
+	fi;
+
+	local OLD_COUNT=$(echo "${OLD_IDS}" | wc -l)
+	echo "Scaling up ${SERVICE}...";
+	docker compose up -d --no-deps --no-recreate --scale "${SERVICE}=$(( OLD_COUNT * 2 ))" "${SERVICE}"
+
+	local NEW_IDS=$(docker compose ps -a -q "${SERVICE}" | grep -vxF "${OLD_IDS}")
+	if [ "" = "${NEW_IDS}" ]; then
+		echo "Failed to start new ${SERVICE} containers, stopping."
+		exit 1;
+	fi;
+
+	for ID in ${NEW_IDS}; do
+		echo "Waiting for ${ID:0:12} to become healthy..."
+		if [ "$(containerHealth "${ID}")" = "none" ]; then
+			echo "${ID:0:12} has no healthcheck, can't tell when it is ready."
+			sleep 10;
+		elif ! waitForHealth "${ID}" healthy "${HEALTH_TIMEOUT}"; then
+			echo "${ID:0:12} did not become healthy ($(containerHealth "${ID}")), removing new containers and stopping."
+			docker logs --tail 20 "${ID}"
+			docker rm -f ${NEW_IDS}
+			exit 1;
+		fi;
+	done;
+
+	# Give traefik time to start routing to the new containers.
+	sleep "${TRAEFIK_GRACE}";
+
+	echo "Draining old ${SERVICE} containers...";
+	for ID in ${OLD_IDS}; do
+		docker exec "${ID}" touch /tmp/drain
+	done;
+
+	for ID in ${OLD_IDS}; do
+		if [ "$(containerHealth "${ID}")" = "none" ]; then
+			echo "${ID:0:12} has no healthcheck, can't drain it first."
+		elif ! waitForHealth "${ID}" unhealthy "${DRAIN_TIMEOUT}"; then
+			echo "${ID:0:12} did not drain, stopping it anyway."
+		fi;
+	done;
+
+	# Give traefik time to stop routing to the old containers.
+	sleep "${TRAEFIK_GRACE}";
+
+	for ID in ${OLD_IDS}; do
+		echo "Stopping old container: ${ID:0:12}";
+		docker stop "${ID}" >/dev/null
+		docker rm -f "${ID}" >/dev/null
+	done;
+}
+
+# Bring up everything else first. --no-deps stops this touching the rolling
+# services (most things depend on api), so they only get recreated below.
+OTHER_SERVICES=$(docker compose config --services | grep -vxF "$(printf '%s\n' "${ROLLING_SERVICES[@]}")")
 
 echo "Starting all..."
-docker compose up -d --remove-orphans
+docker compose up -d --no-deps --remove-orphans ${OTHER_SERVICES}
 
-
-# if [ "" = "${DB_RUNNING}" ]; then
-# 	echo "Waiting for database to start..."
-# 	sleep 10;
-# fi;
-
-# prepareAPIContainers;
+for SERVICE in "${ROLLING_SERVICES[@]}"; do
+	rollingUpdate "${SERVICE}"
+done;
