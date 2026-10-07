@@ -36,9 +36,9 @@ if [ ${?} -ne 0 ]; then
 fi;
 
 # Ensure volumes exist with correct permissions
-uid0Volumes=(chronograf-data influxdb-data)
+uid0Volumes=(chronograf-data influxdb-data victorialogs-data)
 uid33Volumes=(bind-data)
-uid999Volumes=(db-data mongo-data rabbitmq-data rabbitmq-log redis-data)
+uid999Volumes=(db-data rabbitmq-data rabbitmq-log redis-data)
 
 for vol in ${uid0Volumes[@]}; do
     if [ ! -e "./volumes/${vol}" ]; then

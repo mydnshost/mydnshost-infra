@@ -76,3 +76,8 @@ services:
     labels:
       traefik.http.middlewares.rabbitmq-auth.basicauth.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
       traefik.http.routers.rabbitmq.rule: "Host(`rabbitmq.<VHOST>`)"
+
+  victorialogs:
+    labels:
+      traefik.http.middlewares.victorialogs-auth.basicauth.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
+      traefik.http.routers.victorialogs.rule: "Host(`victorialogs.<VHOST>`)"

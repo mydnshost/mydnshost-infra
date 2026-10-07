@@ -59,14 +59,13 @@ cp rndc_rndc.example.conf rndc_rndc.conf
 cp api-config.local.example.php api-config.local.php
 cp frontend-config.local.example.php frontend-config.local.php
 cp traefik/traefik.example.toml traefik/traefik.toml
-cp logstash/logstash.example.conf logstash/logstash.conf
 ```
 ### Edit non-example files as needed.
 
 You will need to edit all of the non-example files to suit your deployment.
 
 ```bash
-nano bind_rndc.conf docker-compose.override.yml rndc_rndc.conf api-config.local.php frontend-config.local.php traefik/traefik.toml logstash/logstash.conf
+nano bind_rndc.conf docker-compose.override.yml rndc_rndc.conf api-config.local.php frontend-config.local.php traefik/traefik.toml
 ```
 
 Of note:
@@ -93,9 +92,6 @@ Of note:
 - Nothing needs to go in here unless you wish to override settings from (as per `config.php` in mydnshost/frontend) in a way that can't be done with ENV vars.
 
 **traefik/traefik.toml**
-- Nothing should need changing here.
-
-**logstash/logstash.conf**
 - Nothing should need changing here.
 
 ### Bring services up / Update running services.

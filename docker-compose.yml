@@ -1,31 +1,6 @@
 ---
 
 services:
-  logspout:
-    image: bekt/logspout-logstash:latest
-    restart: always
-    container_name: mydnshost_logspout
-    command: 'logstash://logger:5000?filter.labels=mydnshost.log:true'
-    environment:
-      - INACTIVITY_TIMEOUT=1m
-    networks:
-      - mydnshost-internal
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
-  logger:
-    image: logstash:7.3.0
-    restart: always
-    container_name: mydnshost_logger
-    command: -f /logstash.conf
-    environment:
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-      XPACK_MONITORING_ENABLED: "false"
-    networks:
-      - mydnshost-internal
-    volumes:
-     - ./logstash/logstash.conf:/logstash.conf
-
   proxy:
     image: traefik:v3.7.14
     container_name: mydnshost_proxy
@@ -120,7 +95,7 @@ services:
       - REDIS_HOST=redis
       - INFLUX_HOST=influxdb
       - RABBITMQ_HOST=rabbitmq
-      - MONGO_HOST=mongo
+      - VICTORIALOGS_URL=http://victorialogs:9428
     restart: always
     networks:
       - mydnshost-internal
@@ -173,24 +148,6 @@ services:
       - ./api-config.local.php:/dnsapi/config.local.php
     labels:
       mydnshost.log: "true"
-
-  containerlogger:
-    image: registry.shanemcc.net/mydnshost-public/containerlogger:latest
-    container_name: mydnshost_containerlogger
-    hostname: containerlogger
-    domainname: mydnshost.co.uk
-    environment:
-      - RABBITMQ_HOST=rabbitmq
-      - MONGO_HOST=mongo
-      - DOCKERLOGS_SIZE_MB=2048
-    restart: always
-    networks:
-      - mydnshost-internal
-    depends_on:
-      - api
-      - rabbitmq
-    volumes:
-      - ./api-config.local.php:/dnsapi/config.local.php
 
   dispatcher:
     image: registry.shanemcc.net/mydnshost-public/dispatcher:latest
@@ -433,21 +390,6 @@ services:
     labels:
       mydnshost.log: "true"
 
-  mongo:
-    image: mongo:4.4
-    container_name: mydnshost_mongo
-    hostname: mongo
-    domainname: mydnshost.co.uk
-    command: --wiredTigerCacheSizeGB 1
-    mem_limit: 2g
-    restart: always
-    networks:
-      - mydnshost-internal
-    volumes:
-      - ./volumes/mongo-data:/data/db
-    labels:
-      mydnshost.log: "true"
-
   rabbitmq:
     image: rabbitmq:3.10-management
     container_name: mydnshost_rabbitmq
@@ -469,6 +411,40 @@ services:
       traefik.enable: "true"
       mydnshost.log: "true"
 
+  victorialogs:
+    image: victoriametrics/victoria-logs:v1.53.0
+    container_name: mydnshost_victorialogs
+    hostname: victorialogs
+    domainname: mydnshost.co.uk
+    command:
+      - -storageDataPath=/vlogs
+      - -retentionPeriod=100y
+      - -retention.maxDiskSpaceUsageBytes=2GiB
+    restart: always
+    networks:
+      - mydnshost-internal
+    volumes:
+      - ./volumes/victorialogs-data:/vlogs
+    labels:
+      traefik.http.middlewares.victorialogs-auth.basicauth.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
+      traefik.http.routers.victorialogs.rule: "Host(`victorialogs.dev.mydnshost.co.uk`)"
+      traefik.http.routers.victorialogs.middlewares: "victorialogs-auth, security-headers"
+      traefik.http.services.victorialogs.loadbalancer.server.port: "9428"
+      traefik.enable: "true"
+      mydnshost.log: "true"
+
+  vector:
+    image: timberio/vector:0.59.0-alpine
+    container_name: mydnshost_vector
+    restart: always
+    networks:
+      - mydnshost-internal
+    depends_on:
+      - victorialogs
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./vector/vector.yaml:/etc/vector/vector.yaml:ro
+
 volumes:
 
   db-data:
@@ -480,8 +456,6 @@ volumes:
   chronograf-data:
 
   redis-data:
-
-  mongo-data:
 
   rabbitmq-log:
 
