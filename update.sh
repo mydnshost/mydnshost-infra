@@ -19,6 +19,22 @@ if [ ${?} -ne 0 ]; then
 	exit 1;
 fi;
 
+# Check the compose files (including docker-compose.override.yml) are valid
+# before changing anything, eg the override still configuring a service that
+# has been removed from docker-compose.yml.
+if ! docker compose config -q; then
+	echo "docker compose config failed, docker-compose.override.yml probably needs updating."
+	exit 1;
+fi;
+
+# Services only in the override are allowed, but may be leftovers from
+# services that have been removed from docker-compose.yml.
+OVERRIDE_ONLY=$(comm -13 <(docker compose -f docker-compose.yml config --services | sort) <(docker compose config --services | sort))
+if [ "${OVERRIDE_ONLY}" != "" ]; then
+	echo "These services are only defined in docker-compose.override.yml, check they are still wanted:"
+	echo "${OVERRIDE_ONLY}" | sed 's/^/  - /'
+fi;
+
 # Update images
 echo 'Updating images...';
 docker compose pull
