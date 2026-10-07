@@ -78,7 +78,6 @@ Of note:
 - You will want to ensure the database root password is set.
 - The `STATUSCAKE_` and env vars for the `maintenance` container are used for monitoring, 3rd party deployments can probably leave this alone, so just leave them blank. `INFLUX_BIND_SLAVES` is used by the `gather-statistics` cron to pull data from the public-facing servers, format is something like: `INFLUX_BIND_SLAVES=ns1=10.0.0.1, ns2=10.0.0.2, ns3=10.0.0.3`. Leave blank to disable this.
 - `bind` container needs it's own public IP eg `MASTER=1.1.1.1;` and then the IPs of the public-facing servers as `SLAVES=10.0.0.1; 10.0.0.2; 10.0.0.3;`), You will want to ensure you copy the bind rndc key from bind_rndc.conf also.
-- `chronograf` requires oauth configuration to run otherwise it will refuse to start. See: https://docs.influxdata.com/chronograf/v1.9/administration/managing-security/#configure-github-authentication
 - There are other things you can override based on the `docker.compose.yml` but the things in this file already are the minimum to get things functional.
 
 **rndc_rndc.conf**

@@ -52,7 +52,7 @@ if [ ${?} -ne 0 ]; then
 fi;
 
 # Ensure volumes exist with correct permissions
-uid0Volumes=(chronograf-data influxdb-data victorialogs-data)
+uid0Volumes=(influxdb-data victorialogs-data)
 uid33Volumes=(bind-data)
 uid999Volumes=(db-data rabbitmq-data rabbitmq-log redis-data)
 

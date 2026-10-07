@@ -353,30 +353,6 @@ services:
     labels:
       mydnshost.log: "true"
 
-  chronograf:
-    image: chronograf:alpine
-    container_name: mydnshost_chronograf
-    hostname: chronograf
-    domainname: mydnshost.co.uk
-    restart: always
-    networks:
-      - mydnshost-internal
-    volumes:
-      - ./volumes/chronograf-data:/var/lib/chronograf
-    environment:
-      - TOKEN_SECRET=SomeKindOfSecret
-      - AUTH_DURATION=1h
-      - GH_CLIENT_ID=
-      - GH_CLIENT_SECRET=
-      - GH_ORGS=
-      - INFLUXDB_URL=http://influxdb:8086/
-    labels:
-      traefik.enable: "true"
-      traefik.http.routers.chronograf.rule: "Host(`chronograf.dev.mydnshost.co.uk`)"
-      traefik.http.routers.chronograf.middlewares: "security-headers"
-      traefik.http.services.chronograf.loadbalancer.server.port: "8888"
-      mydnshost.log: "true"
-
   redis:
     image: redis:latest
     container_name: mydnshost_redis
@@ -452,8 +428,6 @@ volumes:
   bind-data:
 
   influxdb-data:
-
-  chronograf-data:
 
   redis-data:
 

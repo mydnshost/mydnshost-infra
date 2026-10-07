@@ -4,7 +4,7 @@ DIR="$(dirname "$(readlink -f "$0")")"
 cd "${DIR}"
 export COMPOSE_PROJECT_NAME=mydnshost
 
-legacyVolumes=(bind-data chronograf-data db-data influxdb-data rabbitmq-data rabbitmq-log redis-data)
+legacyVolumes=(bind-data db-data influxdb-data rabbitmq-data rabbitmq-log redis-data)
 
 MIGRATION_NEEDED=0
 

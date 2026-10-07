@@ -62,16 +62,6 @@ services:
       - 53:53/tcp
       - 53:53/udp
 
-  chronograf:
-    environment:
-      - TOKEN_SECRET=SomeKindOfSecret
-      - AUTH_DURATION=1h
-      - GH_CLIENT_ID=
-      - GH_CLIENT_SECRET=
-      - GH_ORGS=
-    labels:
-      traefik.http.routers.chronograf.rule: "Host(`chronograf.<VHOST>`)"
-
   rabbitmq:
     labels:
       traefik.http.middlewares.rabbitmq-auth.basicauth.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
