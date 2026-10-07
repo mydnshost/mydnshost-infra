@@ -418,7 +418,7 @@ services:
     domainname: mydnshost.co.uk
     command:
       - -storageDataPath=/vlogs
-      - -retentionPeriod=100y
+      - -retentionPeriod=30d
       - -retention.maxDiskSpaceUsageBytes=2GiB
     restart: always
     networks:
