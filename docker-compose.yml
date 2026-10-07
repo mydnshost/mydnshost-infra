@@ -95,6 +95,8 @@ services:
       - REDIS_HOST=redis
       - INFLUX_HOST=influxdb
       - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=mydnshost
+      - RABBITMQ_PASS=mydnshost
       - VICTORIALOGS_URL=http://victorialogs:9428
     restart: always
     networks:
@@ -138,6 +140,8 @@ services:
       - DB_SERVER_DATABASE=dnsapi
       - REDIS_HOST=redis
       - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=mydnshost
+      - RABBITMQ_PASS=mydnshost
     restart: always
     networks:
       - mydnshost-internal
@@ -162,6 +166,8 @@ services:
       - DB_SERVER_DATABASE=dnsapi
       - REDIS_HOST=redis
       - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=mydnshost
+      - RABBITMQ_PASS=mydnshost
     restart: always
     networks:
       - mydnshost-internal
@@ -186,6 +192,8 @@ services:
       - DB_SERVER_DATABASE=dnsapi
       - REDIS_HOST=redis
       - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=mydnshost
+      - RABBITMQ_PASS=mydnshost
     restart: always
     networks:
       - mydnshost-internal
@@ -218,6 +226,9 @@ services:
       - DNSSEC_DSKEY_FILES=/bind/keys
       - WORKER_WORKERS=*,-verify_2fa_push,-call_domain_hooks
       - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=mydnshost
+      - RABBITMQ_PASS=mydnshost
+      - RABBITMQ_HEARTBEAT=300
     restart: always
     networks:
       - mydnshost-internal
@@ -243,6 +254,9 @@ services:
       - DB_SERVER_DATABASE=dnsapi
       - WORKER_WORKERS=verify_2fa_push,call_domain_hooks
       - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=mydnshost
+      - RABBITMQ_PASS=mydnshost
+      - RABBITMQ_HEARTBEAT=300
       - REDIS_HOST=redis
     restart: always
     networks:
@@ -305,6 +319,8 @@ services:
       - INFLUX_HOST=influxdb
       - INFLUX_BIND_SLAVES=ns1=1.1.1.1, ns2=2.2.2.2, ns3=3.3.3.3
       - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=mydnshost
+      - RABBITMQ_PASS=mydnshost
       - REDIS_HOST=redis
     volumes:
       - ./maintenance/output:/output
@@ -367,7 +383,7 @@ services:
       mydnshost.log: "true"
 
   rabbitmq:
-    image: rabbitmq:3.10-management
+    image: rabbitmq:4.3-management
     container_name: mydnshost_rabbitmq
     hostname: rabbitmq
     domainname: mydnshost.co.uk
@@ -377,8 +393,16 @@ services:
     volumes:
       - ./volumes/rabbitmq-log:/var/log/rabbitmq
       - ./volumes/rabbitmq-data:/var/lib/rabbitmq
+      - ./rabbitmq/90-mydnshost.conf:/etc/rabbitmq/conf.d/90-mydnshost.conf:ro
     environment:
-      - RABBITMQ_FEATURE_FLAGS=quorum_queue,implicit_default_bindings,virtual_host_metadata,maintenance_mode_status,user_limits
+      - RABBITMQ_DEFAULT_USER=mydnshost
+      - RABBITMQ_DEFAULT_PASS=mydnshost
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /var/lib/rabbitmq/.erlang.cookie && rabbitmq-diagnostics -q check_port_connectivity"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     labels:
       traefik.http.middlewares.rabbitmq-auth.basicauth.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
       traefik.http.routers.rabbitmq.rule: "Host(`rabbitmq.dev.mydnshost.co.uk`)"
