@@ -131,7 +131,6 @@ services:
       - ./volumes/bind-data:/bind
       - ./api-config.local.php:/dnsapi/config.local.php
       - ./rndc_rndc.conf:/etc/bind/rndc.conf
-      - /var/run/docker.sock:/var/run/docker.sock
     # See web healthcheck. start_period is longer as init.php (db migrations)
     # runs before apache starts.
     healthcheck:
