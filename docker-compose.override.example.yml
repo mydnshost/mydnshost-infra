@@ -64,8 +64,12 @@ services:
 
   rabbitmq:
     labels:
+      # The management UI sends its own login through traefik, so this user
+      # also needs to exist in rabbitmq with the same password
+      # (rabbitmqctl add_user / set_user_tags administrator / set_permissions).
       traefik.http.middlewares.rabbitmq-auth.basicauth.users: "user:$$apr1$$MaV/E6fT$$vmOmd5I4TKc2O37If4MxM0"
       traefik.http.routers.rabbitmq.rule: "Host(`rabbitmq.<VHOST>`)"
+      traefik.http.routers.rabbitmq-version.rule: "Host(`rabbitmq.<VHOST>`) && Path(`/api/version`)"
 
   victorialogs:
     labels:
