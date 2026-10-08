@@ -358,6 +358,8 @@ services:
 
   influxdb:
     image: influxdb:1.13-alpine
+    # 1.10+ images run as uid 1500, but the existing data is root-owned from 1.8.
+    user: root
     container_name: mydnshost_influxdb
     hostname: influxdb
     domainname: mydnshost.co.uk
